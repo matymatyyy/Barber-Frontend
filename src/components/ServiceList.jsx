@@ -1,50 +1,90 @@
-import React from 'react';
+import { useEffect, useState } from "react";
 
-function ServiceList ({services, isLoading}) {
-    if (isLoading) {
-        return (
-            <div style={styles.loadingContainer}>
-                <p style={styles.loadingText}>Cargando servicios...</p>
-            </div>
-        );
+import Spinner from "./Spinner";
+
+function ServiceList () {
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    const token = localStorage.getItem("token");
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:91/services', {
+        method: 'GET',
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": token,
+        },
+      });
+
+      if (!response.ok) {
+        localStorage.removeItem("token");
+        navigate("/");
+        alert("Sesión expirada o token inválido. Vuelve a iniciar sesión.");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Resultados:", data);
+      setServices(data.data || data);
+
+    } catch (error) {
+      console.error("Error en search:", error);
+      alert("No se pudo conectar al servidor");
+      setServices([]);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    if (!services || services.length === 0) {
-        return (
-            <div style={styles.emptyContainer}>
-                <p style={styles.emptyText}>No se encontraron servicios. Haz clic en "Search" para buscar.</p>
-            </div>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <div style={styles.container}>
-            <h2 style={styles.title}>Servicios Encontrados ({services.length})</h2>
-            <div style={styles.grid}>
-
-            {services.map((service) => (
-                <div key={service.id} style={styles.card}>
-                    <div style={styles.cardContent}>   
-
-                        <div>
-                            <h3 style={styles.serviceType}>
-                                {service.type}
-                            </h3>
-                            <p style={styles.serviceInfo}>
-                                <strong>Precio: $</strong>{service.price}
-                            </p>
-                            <p style={styles.serviceInfo}>
-                                <strong>ID:</strong>{service.id}
-                            </p>
-                        </div>
-                        
-                    </div>
-                </div>
-            ) )}
-            </div>
-        </div>
+      <div style={styles.loadingContainer}>
+        <Spinner />
+      </div>
     );
+  }
 
+  if (!services || services.length === 0) {
+    return (
+      <div style={styles.emptyContainer}>
+        <p style={styles.emptyText}>No se encontraron servicios. Haz clic en "Search" para buscar.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={styles.container}>
+      <h2 style={styles.title}>Servicios Encontrados ({services.length})</h2>
+      <div style={styles.grid}>
+        {services.map((service) => (
+          <div key={service.id} style={styles.card}>
+            <div style={styles.cardContent}>   
+              <div>
+                <h3 style={styles.serviceType}>
+                  {service.type}
+                </h3>
+                <p style={styles.serviceInfo}>
+                  <strong>Precio: $</strong>{service.price}
+                </p>
+                <p style={styles.serviceInfo}>
+                  <strong>ID:</strong>{service.id}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) )}
+      </div>
+    </div>
+  );
 }
 
 export default ServiceList;

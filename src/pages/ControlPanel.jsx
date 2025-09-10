@@ -1,54 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ServiceList from './ServiceList'; 
-import Spinner from "./Spinner";
+import ServiceList from '../components/ServiceList'; 
 
 function ControlPanel () {
-    const navigate = useNavigate();
-    const [services, setServices] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleLogout = () => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
     // Elimina el token del estado también al hacer logout
     setServices([]);
-    navigate("/");
-  };
-
-  const handleSearch = async () => {
-    const token = localStorage.getItem("token");
-    setIsLoading(true); // Activar loading
-
-    try {
-        const response = await fetch('http://localhost:91/barbers', {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-                "x-api-key": token,
-            },
-        });
-
-        if (!response.ok) {
-        localStorage.removeItem("token");
-        navigate("/");
-        alert("Sesión expirada o token inválido. Vuelve a iniciar sesión.");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Resultados:", data);
-      
-      // Actualizar el estado con los dominios recibidos
-      // Asumiendo que la estructura es { data: Array }
-      setServices(data.data || data); // Usar data.data si existe, sino usar data directamente
-
-    } catch (error) {
-        console.error("Error en search:", error);
-        alert("No se pudo conectar al servidor");
-        setServices([]); // Limpiar dominios en caso de erro
-    } finally {
-      setIsLoading(false); // Desactivar loading
-    }
-
+    navigate("/login/admin");
   };
 
   return (
@@ -58,8 +17,7 @@ function ControlPanel () {
             <h3 style={styles.sidebarTitle}> Menu </h3>
 
             <div style={styles.buttonContainer}> 
-                <button onClick={handleSearch} disabled={isLoading} style={styles.button}> 
-                    {isLoading ? "Buscando..." : "Search"} 
+                <button style={styles.button}> Buscar
                 </button>
                 <button onClick={handleLogout} style={styles.button}>
                     Logout
@@ -70,8 +28,7 @@ function ControlPanel () {
 
         <div style={styles.mainContent}> 
             <h1 style={styles.welcomeTitle}> Bienvenido 🎉 </h1>
-            {isLoading && <Spinner  styles={styles} />} 
-            <ServiceList services={services} isLoading={isLoading} />
+            <ServiceList />
         </div>
 
     </div>
@@ -135,19 +92,5 @@ const styles = {
     marginBottom: '20px',
     fontSize: '28px',
     fontWeight: '300'
-  },
-  overlay: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '20px',
-  },
-  spinner: {
-    width: '30px',
-    height: '30px',
-    border: '4px solid #f3f3f3',
-    borderTop: '4px solid #3498db',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite'
   },
 };
