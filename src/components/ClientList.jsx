@@ -2,22 +2,22 @@ import { useEffect, useState } from "react";
 
 import Spinner from "./Spinner";
 
-function TurnConfigDayList () {
+function ClientList () {
 
   const [isLoading, setIsLoading] = useState(true);
-  const [turnsConfigDay, setTurnConfigDay] = useState([]);
+  const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    loadTurnConfigDay();
+    loadClient();
   }, []);
 
-  const loadTurnConfigDay = async () => {
+  const loadClient = async () => {
     const token = localStorage.getItem("token");
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:91/turns_config_day', {
+      const response = await fetch('http://localhost:91/clients', {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -34,12 +34,12 @@ function TurnConfigDayList () {
 
       const data = await response.json();
       console.log("Resultados:", data);
-      setTurnConfigDay(data.data || data);
+      setClients(data.data || data);
 
     } catch (error) {
       console.error("Error en search:", error);
       alert("No se pudo conectar al servidor");
-      setTurnConfigDay([]);
+      setClients([]);
     } finally {
       setIsLoading(false);
     }
@@ -53,37 +53,40 @@ function TurnConfigDayList () {
     );
   }
 
-  if (!turnsConfigDay || turnsConfigDay.length === 0) {
+  if (!clients || clients.length === 0) {
     return (
       <div style={styles.emptyContainer}>
-        <p style={styles.emptyText}>No se encontraron dias configurados. Haz clic en "Search" para buscar.</p>
+        <p style={styles.emptyText}>No se encontraron clientes. Haz clic en "Search" para buscar.</p>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Configuraciones encontradas ({turnsConfigDay.length})</h2>
+      <h2 style={styles.title}>Clientes encontradas ({clients.length})</h2>
       <div style={styles.grid}>
-        {turnsConfigDay.map((turnConfigDay) => (
+        {clients.map((client) => (
 
-          <div key={turnConfigDay.id} style={styles.card}>
+          <div key={client.id} style={styles.card}>
             <div style={styles.cardContent}>   
               <div>
-                <h3 style={styles.turnConfigDayTitle}>
-                  {turnConfigDay.day}
+                <h3 style={styles.clientTitle}>
+                  {client.name}
                 </h3>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Duracion </strong>{turnConfigDay.turnTime}
+                <p style={styles.clientInfo}>
+                  <strong>Correo electonico </strong>{client.email}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Horario de apertura </strong>{turnConfigDay.hourBegin}
+                <p style={styles.clientInfo}>
+                  <strong>Contraseña? </strong>{client.password}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Horario de cierre </strong>{turnConfigDay.hourEnd}
+                <p style={styles.clientInfo}>
+                  <strong>DNI </strong>{client.dni}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>ID:</strong>{turnConfigDay.id}
+                <p style={styles.clientInfo}>
+                  <strong>Numero de telefono </strong>{client.cellphone}
+                </p>
+                <p style={styles.clientInfo}>
+                  <strong>ID:</strong>{client.id}
                 </p>
               </div>
             </div>
@@ -95,7 +98,7 @@ function TurnConfigDayList () {
   );
 }
 
-export default TurnConfigDayList;
+export default ClientList;
 
 const styles = {
   container: {
@@ -128,13 +131,13 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  turnConfigDayTitle: {
+  clientTitle: {
     margin: '0 0 8px 0',
     color: '#2c3e50',
     fontSize: '18px',
     fontWeight: '600'
   },
-  turnConfigDayInfo: {
+  clientInfo: {
     margin: '5px 0 0 0',
     color: '#666',
     fontSize: '14px'

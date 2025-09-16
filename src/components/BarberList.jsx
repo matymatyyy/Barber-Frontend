@@ -2,22 +2,22 @@ import { useEffect, useState } from "react";
 
 import Spinner from "./Spinner";
 
-function TurnConfigDayList () {
+function BarberList () {
 
   const [isLoading, setIsLoading] = useState(true);
-  const [turnsConfigDay, setTurnConfigDay] = useState([]);
+  const [barbers, setBarbers] = useState([]);
 
   useEffect(() => {
-    loadTurnConfigDay();
+    loadBarber();
   }, []);
 
-  const loadTurnConfigDay = async () => {
+  const loadBarber = async () => {
     const token = localStorage.getItem("token");
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:91/turns_config_day', {
+      const response = await fetch('http://localhost:91/barbers', {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -34,12 +34,12 @@ function TurnConfigDayList () {
 
       const data = await response.json();
       console.log("Resultados:", data);
-      setTurnConfigDay(data.data || data);
+      setBarbers(data.data || data);
 
     } catch (error) {
       console.error("Error en search:", error);
       alert("No se pudo conectar al servidor");
-      setTurnConfigDay([]);
+      setBarbers([]);
     } finally {
       setIsLoading(false);
     }
@@ -53,37 +53,40 @@ function TurnConfigDayList () {
     );
   }
 
-  if (!turnsConfigDay || turnsConfigDay.length === 0) {
+  if (!barbers || barbers.length === 0) {
     return (
       <div style={styles.emptyContainer}>
-        <p style={styles.emptyText}>No se encontraron dias configurados. Haz clic en "Search" para buscar.</p>
+        <p style={styles.emptyText}>No se encontraron peluqueros. Haz clic en "Search" para buscar.</p>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Configuraciones encontradas ({turnsConfigDay.length})</h2>
+      <h2 style={styles.title}>Peluqueros encontradas ({barbers.length})</h2>
       <div style={styles.grid}>
-        {turnsConfigDay.map((turnConfigDay) => (
+        {barbers.map((barber) => (
 
-          <div key={turnConfigDay.id} style={styles.card}>
+          <div key={barber.id} style={styles.card}>
             <div style={styles.cardContent}>   
               <div>
-                <h3 style={styles.turnConfigDayTitle}>
-                  {turnConfigDay.day}
+                <h3 style={styles.barberTitle}>
+                  {barber.name}
                 </h3>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Duracion </strong>{turnConfigDay.turnTime}
+                <p style={styles.barberInfo}>
+                  <strong>Correo electonico </strong>{barber.email}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Horario de apertura </strong>{turnConfigDay.hourBegin}
+                <p style={styles.barberInfo}>
+                  <strong>Contraseña? </strong>{barber.password}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>Horario de cierre </strong>{turnConfigDay.hourEnd}
+                <p style={styles.barberInfo}>
+                  <strong>DNI </strong>{barber.dni}
                 </p>
-                <p style={styles.turnConfigDayInfo}>
-                  <strong>ID:</strong>{turnConfigDay.id}
+                <p style={styles.barberInfo}>
+                  <strong>Numero de telefono </strong>{barber.cellphone}
+                </p>
+                <p style={styles.barberInfo}>
+                  <strong>ID:</strong>{barber.id}
                 </p>
               </div>
             </div>
@@ -95,7 +98,7 @@ function TurnConfigDayList () {
   );
 }
 
-export default TurnConfigDayList;
+export default BarberList;
 
 const styles = {
   container: {
@@ -128,13 +131,13 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  turnConfigDayTitle: {
+  barberTitle: {
     margin: '0 0 8px 0',
     color: '#2c3e50',
     fontSize: '18px',
     fontWeight: '600'
   },
-  turnConfigDayInfo: {
+  barberInfo: {
     margin: '5px 0 0 0',
     color: '#666',
     fontSize: '14px'
