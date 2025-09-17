@@ -4,10 +4,15 @@ import ServiceList from '../components/ServiceList';
 
 function ControlPanel () {
   const navigate = useNavigate();
+
   const handleLogout = () => {
     // Elimina el token del estado también al hacer logout
     setServices([]);
     navigate("/login/admin");
+  };
+
+  const handleEntity = () => {
+    
   };
 
   return (
@@ -17,7 +22,7 @@ function ControlPanel () {
             <h3 style={styles.sidebarTitle}> Menu </h3>
 
             <div style={styles.buttonContainer}> 
-                <button style={styles.button}> Buscar
+                <button onClick={handleEntity} style={styles.button}> Servicios
                 </button>
                 <button onClick={handleLogout} style={styles.button}>
                     Logout
@@ -28,7 +33,7 @@ function ControlPanel () {
 
         <div style={styles.mainContent}> 
             <h1 style={styles.welcomeTitle}> Bienvenido 🎉 </h1>
-            <ServiceList />
+            <ServiceList style={styles.hidden}/>
         </div>
 
     </div>
@@ -93,4 +98,7 @@ const styles = {
     fontSize: '28px',
     fontWeight: '300'
   },
+  hidden: {
+    display: "none"
+  }
 };
