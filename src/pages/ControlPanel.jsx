@@ -22,10 +22,20 @@ function ControlPanel () {
             <h3 style={styles.sidebarTitle}> Menu </h3>
 
             <div style={styles.buttonContainer}> 
-                <button onClick={handleEntity} style={styles.button}> Servicios
+                <button onClick={handleEntity} style={styles.button}> 
+                  Servicios
+                </button>
+                <button onClick={handleEntity} style={styles.button}> 
+                  Configuracion de dias
+                </button>
+                <button onClick={handleEntity} style={styles.button}> 
+                  Peluqueros
+                </button>
+                <button onClick={handleEntity} style={styles.button}> 
+                  Clientes
                 </button>
                 <button onClick={handleLogout} style={styles.button}>
-                    Logout
+                  Logout
                 </button>
             </div>
 

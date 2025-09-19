@@ -3,29 +3,66 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 
 import fetchServiceList from "../components/functionComponents/Service/fetchServiceList";
+import fetchServiceDelete from "../components/functionComponents/Service/fetchServiceDelete";
 
 function ServiceCard () {
  
-  
   const [error, setError] = useState(null)
   const [services, setServices] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(null);
   const navigate = useNavigate();
   
-    const loadServices = async () => {
-      try {
-        setError(null)
-        const serviceList = await fetchServiceList();
-        setServices(serviceList);
-      } catch (error) {
-        console.error("Error cargando servicios:", error);
-        setError(error.message);
+  const loadServices = async () => {
+    try {
+      setError(null)
+      const serviceList = await fetchServiceList();
+      setServices(serviceList);
+    } catch (error) {
+      console.error("Error cargando servicios:", error);
+      setError(error.message);
 
-        if (error.message.includes("Sesión expirada")) {
-          alert(error.message);
-          navigate("/");
-        }  
+      if (error.message.includes("Sesión expirada")) {
+        alert(error.message);
+        navigate("/");
+      }  
+    }
+  };
+
+  const handleDeleteService = async (serviceId) => {
+
+    const confirmDelete = window.confirm(
+      "¿Estás seguro de que quieres eliminar este servicio? Esta acción no se puede deshacer."
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      setIsDeleting(serviceId); 
+      
+      await fetchServiceDelete(serviceId);
+      
+      setServices(prevServices => 
+        prevServices.filter(service => service.id !== serviceId)
+      );
+      
+      alert("Servicio eliminado exitosamente");
+      
+    } catch (error) {
+      console.error("Error eliminando servicio:", error);
+      
+      if (error.message.includes("Sesión expirada")) {
+        alert(error.message);
+        navigate("/");
+      } else {
+        alert(`Error al eliminar servicio: ${error.message}`);
       }
-    };
+    } finally {
+      setIsDeleting(null); 
+    }
+  };  
+
 
   useEffect(() => {
     loadServices();
@@ -59,12 +96,15 @@ function ServiceCard () {
                 </p>
                 
               <div style={styles.buttonSection}>
-                <button style={styles.deleteButton}>
+
+                <button onClick={() => handleDeleteService(service.id)} style={styles.deleteButton}>
                   x
                 </button>
+                
                 <button style={styles.editButton}>
                   e
                 </button>
+
               </div>
 
             </div>
@@ -138,7 +178,6 @@ const styles = {
   },
   buttonSection: {
     display: 'flex',
-    justifyContent: 'space-evenly',
     alignItems: 'center'
   },
   deleteButton: {
