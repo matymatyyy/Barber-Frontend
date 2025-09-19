@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ServiceList from '../components/ServiceList'; 
+import ServiceCard from '../components/ServiceCard'; 
 
 function ControlPanel () {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ function ControlPanel () {
 
         <div style={styles.mainContent}> 
             <h1 style={styles.welcomeTitle}> Bienvenido 🎉 </h1>
-            <ServiceList style={styles.hidden}/>
+            <ServiceCard />
         </div>
 
     </div>

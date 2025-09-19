@@ -1,57 +1,36 @@
 import { useEffect, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
 
-function ServiceList () {
+import fetchServiceList from "../components/functionComponents/Service/fetchServiceList";
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [services, setServices] = useState([]);
+function ServiceCard () {
+ 
+  
+  const [error, setError] = useState(null)
+  const [services, setServices] = useState(null);
+  const navigate = useNavigate();
+  
+    const loadServices = async () => {
+      try {
+        setError(null)
+        const serviceList = await fetchServiceList();
+        setServices(serviceList);
+      } catch (error) {
+        console.error("Error cargando servicios:", error);
+        setError(error.message);
+
+        if (error.message.includes("Sesión expirada")) {
+          alert(error.message);
+          navigate("/");
+        }  
+      }
+    };
 
   useEffect(() => {
     loadServices();
   }, []);
 
-  const loadServices = async () => {
-    const token = localStorage.getItem("token");
-
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('http://localhost:91/services', {
-        method: 'GET',
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": token,
-        },
-      });
-
-      if (!response.ok) {
-        localStorage.removeItem("token");
-        navigate("/");
-        alert("Sesión expirada o token inválido. Vuelve a iniciar sesión.");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Resultados:", data);
-      setServices(data.data || data);
-
-    } catch (error) {
-      console.error("Error en search:", error);
-      alert("No se pudo conectar al servidor");
-      setServices([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div style={styles.loadingContainer}>
-        <Spinner />
-      </div>
-    );
-  }
 
   if (!services || services.length === 0) {
     return (
@@ -60,15 +39,15 @@ function ServiceList () {
       </div>
     );
   }
-
+ 
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Servicios Encontrados ({services.length})</h2>
       <div style={styles.grid}>
         {services.map((service) => (
           <div key={service.id} style={styles.card}>
-            <div style={styles.cardContent}>   
-              <div>
+            <div style={styles.cardContent}>  
+               
                 <h3 style={styles.serviceType}>
                   {service.type}
                 </h3>
@@ -78,7 +57,16 @@ function ServiceList () {
                 <p style={styles.serviceInfo}>
                   <strong>ID:</strong>{service.id}
                 </p>
+                
+              <div style={styles.buttonSection}>
+                <button style={styles.deleteButton}>
+                  x
+                </button>
+                <button style={styles.editButton}>
+                  e
+                </button>
               </div>
+
             </div>
           </div>
         ) )}
@@ -87,7 +75,7 @@ function ServiceList () {
   );
 }
 
-export default ServiceList;
+export default ServiceCard;
 
 const styles = {
   container: {
@@ -147,5 +135,18 @@ const styles = {
   emptyText: {
     color: '#7f8c8d',
     fontSize: '16px'
-  }
+  },
+  buttonSection: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center'
+  },
+  deleteButton: {
+    backgroundColor: '#f54b45d8',
+    color: '#EEEEF9',
+  },
+  editButton: {
+    backgroundColor: '#f3bd2ad8',
+    color: '#1a1a1aff',
+  },
 };
