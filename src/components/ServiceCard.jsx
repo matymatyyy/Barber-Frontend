@@ -29,7 +29,6 @@ function ServiceCard () {
   };
 
   const handleDeleteService = async (serviceId) => {
-
     const confirmDelete = window.confirm(
       "¿Estás seguro de que quieres eliminar este servicio? Esta acción no se puede deshacer."
     );
@@ -46,7 +45,7 @@ function ServiceCard () {
       setServices(prevServices => 
         prevServices.filter(service => service.id !== serviceId)
       );
-      
+
       alert("Servicio eliminado exitosamente");
       
     } catch (error) {
@@ -63,6 +62,13 @@ function ServiceCard () {
     }
   };  
 
+  const handleUpdatorService = async (serviceId) => {
+
+  };
+
+  const showUpdateFrom = async () => {
+
+  };
 
   useEffect(() => {
     loadServices();
@@ -84,7 +90,7 @@ function ServiceCard () {
         {services.map((service) => (
           <div key={service.id} style={styles.card}>
             <div style={styles.cardContent}>  
-               
+               <div>
                 <h3 style={styles.serviceType}>
                   {service.type}
                 </h3>
@@ -94,17 +100,15 @@ function ServiceCard () {
                 <p style={styles.serviceInfo}>
                   <strong>ID:</strong>{service.id}
                 </p>
-                
-              <div style={styles.buttonSection}>
+              </div>
 
+              <div style={styles.buttonSection}>
                 <button onClick={() => handleDeleteService(service.id)} style={styles.deleteButton}>
                   x
                 </button>
-                
                 <button style={styles.editButton}>
                   e
                 </button>
-
               </div>
 
             </div>
