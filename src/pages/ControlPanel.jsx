@@ -1,96 +1,127 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import ServiceList from '../components/ServiceList'; 
+// pages/HomePage.jsx
 
-function ControlPanel () {
-  const navigate = useNavigate();
+//hooks
+import { useServices } from "../hooks/useServices";
+import { useAuth } from "../hooks/useAuth";
+//components
+import ServiceList from "../components/ServiceList";
+import Spinner from "../components/Spinner";
+
+//utils
+import { capitalize } from "../utils/formatters";
+
+export default function HomePage() {
+  const { services, isLoading, error, searchServices } = useServices();
+  const { logout } = useAuth();
+
   const handleLogout = () => {
-    // Elimina el token del estado también al hacer logout
-    setServices([]);
-    navigate("/login/admin");
+    logout();
   };
 
   return (
     <div style={styles.container}>
-        <div style={styles.sidebar}>
-
-            <h3 style={styles.sidebarTitle}> Menu </h3>
-
-            <div style={styles.buttonContainer}> 
-                <button style={styles.button}> Buscar
-                </button>
-                <button onClick={handleLogout} style={styles.button}>
-                    Logout
-                </button>
-            </div>
-
+      {/* Sidebar */}
+      <div style={styles.sidebar}>
+        <h3 style={styles.sidebarTitle}>Menú</h3>
+        <div style={styles.buttonContainer}>
+          <button 
+            onClick={searchServices} 
+            disabled={isLoading}
+            style={styles.button}
+          >
+            {isLoading ? "Buscando..." : "Search"}
+          </button>
+          <button 
+            onClick={handleLogout}
+            style={styles.button}
+          >
+            Logout
+          </button>
         </div>
-
-        <div style={styles.mainContent}> 
-            <h1 style={styles.welcomeTitle}> Bienvenido 🎉 </h1>
-            <ServiceList />
-        </div>
-
+      </div>
+      
+      {/* Contenido principal */}
+      <div style={styles.mainContent}>
+        <h1 style={styles.welcomeTitle}>{capitalize("bienvenido")} 🎉</h1>
+        
+        {error && (
+          <div style={styles.error}>
+            {error}
+          </div>
+        )}
+        
+        {isLoading ? (
+          <Spinner styles={styles} />
+        ) : (
+          <ServiceList services={services} />
+        )}
+      </div>
     </div>
   );
-
 }
-
-export default ControlPanel;
 
 const styles = {
   container: {
-    display: 'flex',
-    minHeight: '100vh',
-    backgroundColor: '#f5f5f5'
+    display: "flex",
+    minHeight: "100vh"
   },
   sidebar: {
-    width: '250px',
-    backgroundColor: '#2c3e50',
-    padding: '20px',
-    boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
-    position: 'fixed',
-    height: '100vh',
-    left: 0,
-    top: 0
+    width: "250px",
+    backgroundColor: "#f8f9fa",
+    padding: "20px",
+    borderRight: "1px solid #dee2e6"
   },
   sidebarTitle: {
-    color: '#ffffff',
-    marginBottom: '30px',
-    fontSize: '18px',
-    fontWeight: '600',
-    textAlign: 'center',
-    borderBottom: '2px solid #34495e',
-    paddingBottom: '15px'
+    color: "#333",
+    marginBottom: "20px"
   },
   buttonContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px"
   },
   button: {
-    padding: '12px 16px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+    backgroundColor: "#007bff",
+    color: "white",
+    padding: "10px 20px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer"
   },
   mainContent: {
-    marginLeft: '250px',
-    padding: '20px',
     flex: 1,
-    backgroundColor: '#ffffff',
-    minHeight: '100vh'
+    padding: "20px"
+  },
+  welcomeTitle: {
+    color: "#333",
+    marginBottom: "20px"
+  },
+  error: {
+    color: "#dc3545",
+    padding: "10px",
+    backgroundColor: "#f8d7da",
+    border: "1px solid #f5c6cb",
+    borderRadius: "4px",
+    marginBottom: "20px"
   },
   welcomeTitle: {
     color: '#2c3e50',
     marginBottom: '20px',
     fontSize: '28px',
     fontWeight: '300'
+  },
+  overlay: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '20px',
+  },
+  spinner: {
+    width: '30px',
+    height: '30px',
+    border: '4px solid #f3f3f3',
+    borderTop: '4px solid #3498db',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite'
   },
 };
