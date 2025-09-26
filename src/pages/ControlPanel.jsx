@@ -10,7 +10,7 @@ import Spinner from "../components/Spinner";
 //utils
 import { capitalize } from "../utils/formatters";
 
-export default function HomePage() {
+export default function ControlPanel() {
   const { services, isLoading, error, searchServices } = useServices();
   const { logout } = useAuth();
 
