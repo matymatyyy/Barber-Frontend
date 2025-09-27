@@ -6,28 +6,45 @@ import { getToken, removeToken } from "../utils/storage";
 
 export function useServices() {
   const [services, setServices] = useState([]);
-  const [type, setType] = useState("");
-  const [price, setPrice] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const searchServices = async () => {
-    const token = getToken();
+const searchServices = async () => {
+  const token = getToken();
+  
+  if (!token) {
+    navigate("/");
+    return;
+  }
+
+  setIsLoading(true);
+  setError(null);
+
+  try {
+    const data = await fetchServices(token);
+    setServices(data);
+  } catch (err) {
+    setError(err.message);
+    setServices([]);
     
-    if (!token) {
+    // Si el token es inválido, redirigir al login
+    if (err.message.includes("inválido") || err.message.includes("expirada")) {
+      removeToken();
       navigate("/");
-      return;
     }
+  } finally {
+    setIsLoading(false);
+  }
+}
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const data = await fetchServices(token);
-      setServices(data);
-    } catch (err) {
-      setError(err.message);
+const updateServices = async (id, type, price) => {
+  try {
+    const data = await fetchUpdateService(token, id, type, price);
+    setServices(data);
+    navigate("/panel")
+  } catch (err) {
+    setError(err.message);
       setServices([]);
       
       // Si el token es inválido, redirigir al login
@@ -38,32 +55,13 @@ export function useServices() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   const clearServices = () => {
     setServices([]);
     setError(null);
   };
-
-  const updateServices = async () => {
-    try {
-      const data = await fetchUpdateService(token, id);
-      //setServices(data);
-    } catch (err) {
-      setError(err.message);
-      //setServices([]);
-      
-      // Si el token es inválido, redirigir al login
-      if (err.message.includes("inválido") || err.message.includes("expirada")) {
-        removeToken();
-        navigate("/");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  };
-
+  
   return {
     services,
     isLoading,
@@ -72,3 +70,5 @@ export function useServices() {
     clearServices,
     updateServices
   };
+}
+

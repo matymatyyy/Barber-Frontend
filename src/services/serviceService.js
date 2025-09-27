@@ -52,14 +52,14 @@ export async function fetchDeleteService(token, id) {
   return data.data || data;
 }
 
-export async function fetchUpdateService(token, id) {
+export async function fetchUpdateService(token, id, type, price) {
   const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ type, price}),
+    body: JSON.stringify({ type, price }),
   });
 
   if (!response.ok) {
