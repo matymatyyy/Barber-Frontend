@@ -29,7 +29,7 @@ export default function ControlPanel() {
             disabled={isLoading}
             style={styles.button}
           >
-            {isLoading ? "Buscando..." : "Search"}
+            {isLoading ? "Buscando..." : "Servicios"}
           </button>
           <button 
             onClick={handleLogout}

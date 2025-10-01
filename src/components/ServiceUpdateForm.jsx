@@ -8,20 +8,19 @@ function ServiceUpdateForm({ service }) {
   const [type, setType] = useState("");
   const [price, setPrice] = useState("");
   const [id, setID] = useState("");
-  const token = getToken();
-
-
+  
+  
   const handleUpdate = async (e) => {
     e.preventDefault();
-
+    const serviceId = service.id;
+  
     try {
-      await updateServices (id, type, price);
-      saveToken(data.token);
-      return data;
+      await updateServices (serviceId, type, price);
+      console.log("llegue aca");
     } catch (error) {
       console.error("hermoso error");
     }
-
+  
   }
 
 <form onSubmit={handleUpdate}>
@@ -44,7 +43,6 @@ function ServiceUpdateForm({ service }) {
   <p>ID: {service.id}</p>
   <input 
   type="submit"
-  onClick={(e) => setID(service.id) } 
   />
 </form>
 

@@ -1,12 +1,13 @@
 // hooks/useServices.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchServices, fetchUpdateService } from "../services/serviceService";
+import { fetchDeleteService, fetchServices, fetchUpdateService } from "../services/serviceService";
 import { getToken, removeToken } from "../utils/storage";
 
 export function useServices() {
   const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -39,13 +40,18 @@ const searchServices = async () => {
 }
 
 const updateServices = async (id, type, price) => {
+  const token = getToken();
   try {
     const data = await fetchUpdateService(token, id, type, price);
-    setServices(data);
-    navigate("/panel")
+    setServices(prevServices => 
+      prevServices.map(service => 
+        service.id === id ? data : service
+      )
+    );
+    navigate("/panel");
+    window.location.reload();
   } catch (err) {
     setError(err.message);
-      setServices([]);
       
       // Si el token es inválido, redirigir al login
       if (err.message.includes("inválido") || err.message.includes("expirada")) {
@@ -56,6 +62,29 @@ const updateServices = async (id, type, price) => {
       setIsLoading(false);
     }
   }
+
+const deleteService = async (id) => {
+  const token = getToken();
+  try {
+    setIsDeleting(id);
+    await fetchDeleteService(token, id);
+    setServices(prevServices => 
+        prevServices.filter(service => service.id !== id)
+      );
+
+    alert("Servicio eliminado exitosamente");
+
+  } catch (err) {
+    setError(err.message);
+      
+      if (err.message.includes("inválido") || err.message.includes("expirada")) {
+        removeToken();
+        navigate("/");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+}  
 
   const clearServices = () => {
     setServices([]);
@@ -68,7 +97,8 @@ const updateServices = async (id, type, price) => {
     error,
     searchServices,
     clearServices,
-    updateServices
+    updateServices,
+    deleteService
   };
 }
 
