@@ -3,18 +3,27 @@ import ServiceUpdateForm from "./ServiceUpdateForm";
 import { useServices } from "../hooks/useServices";
 function ServiceCard({ service }) {
 
-  const [isShown, setIsShown] = useState(true);
+  const [isUpdateFormShown, setIsUpdateFormShown] = useState(true);
+  const [isCreateFormShown, setIsCreateFormShown] = useState(false);
   
-  const show = () => {
-    if(isShown === true) {
-      setIsShown(false);
+  const showUpdateForm = () => {
+    if(isUpdateFormShown === true) {
+      setIsUpdateFormShown(false);
     } else {
-      setIsShown(true);
+      setIsUpdateFormShown(true);
     }
     
   };
 
-    const {services, error, updateServices, deleteService} = useServices();
+  const showCreateForm = () => {
+    if(isCreateFormShown === false) {
+      setIsCreateFormShown(true);
+    } else {
+      setIsCreateFormShown(false);
+    }
+  }
+
+    const {services, error, updateServices, deleteService, createService} = useServices();
     const [type, setType] = useState("");
     const [price, setPrice] = useState("");
   
@@ -25,6 +34,18 @@ function ServiceCard({ service }) {
   
       try {
         await updateServices (serviceId, type, price);
+        console.log("llegue aca");
+      } catch (error) {
+        console.error("hermoso error");
+      }
+  
+    }
+
+    const handleCreate = async (e) => {
+      e.preventDefault();
+  
+      try {
+        await createService (type, price);
         console.log("llegue aca");
       } catch (error) {
         console.error("hermoso error");
@@ -50,9 +71,47 @@ function ServiceCard({ service }) {
     }
 
   return (
-    
+    <div>
+      {isCreateFormShown ?
+      (
+        <>
+        <form onSubmit={handleCreate}>
+          {/*<select onChange={(e) => setType(e.target.value) }>
+            <option value={type}>Corte</option>
+            <option value={type}>Tinte</option>
+          </select>*/}
+          <input 
+            type="text" 
+            placeholder='tipo'
+            value={type}
+            onChange={(e) => setType(e.target.value)} 
+          />
+          <input 
+            type="text" 
+            placeholder='precio'
+            value={price}
+            onChange={(e) => setPrice(e.target.value)} 
+          />
+          <input 
+            type="submit" 
+          />
+        </form>
+
+
+        </>
+      )
+      :
+      (
+        <>
+        <button onClick={showCreateForm}>+</button>
+        </>
+      )
+      }
+
+
     <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
-      {isShown ?
+      
+      {isUpdateFormShown ?
       ( 
         <>
         
@@ -93,11 +152,12 @@ function ServiceCard({ service }) {
         <button onClick={handleDeleteService}>
           x
         </button>
-        <button onClick={show}/*style={styles.editButton}*/>
+        <button onClick={showUpdateForm}/*style={styles.editButton}*/>
           e
         </button>
       </div>
 
+    </div>
     </div>
   );
 }

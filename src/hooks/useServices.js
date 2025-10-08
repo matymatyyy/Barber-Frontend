@@ -1,7 +1,7 @@
 // hooks/useServices.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchDeleteService, fetchServices, fetchUpdateService } from "../services/serviceService";
+import { fetchDeleteService, fetchServices, fetchUpdateService, fetchCreateService } from "../services/serviceService";
 import { getToken, removeToken } from "../utils/storage";
 
 export function useServices() {
@@ -43,17 +43,30 @@ const updateServices = async (id, type, price) => {
   const token = getToken();
   try {
     const data = await fetchUpdateService(token, id, type, price);
-    setServices(prevServices => 
-      prevServices.map(service => 
-        service.id === id ? data : service
-      )
-    );
-    navigate("/panel");
-    window.location.reload();
+    setServices(data);
   } catch (err) {
     setError(err.message);
       
       // Si el token es inválido, redirigir al login
+      if (err.message.includes("inválido") || err.message.includes("expirada")) {
+        removeToken();
+        navigate("/");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+const createService = async (type, price) => {
+  console.log('hellow');
+  const token = getToken();
+  try {
+     console.log('hola');
+    const data = await fetchCreateService(token, type, price);
+    setServices(prevServices => [...prevServices, data]);
+  } catch (err) {
+    setError(err.message);
+      
       if (err.message.includes("inválido") || err.message.includes("expirada")) {
         removeToken();
         navigate("/");
@@ -98,7 +111,8 @@ const deleteService = async (id) => {
     searchServices,
     clearServices,
     updateServices,
-    deleteService
+    deleteService,
+    createService,
   };
 }
 

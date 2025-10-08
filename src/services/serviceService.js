@@ -70,14 +70,14 @@ export async function fetchUpdateService(token, id, type, price) {
   return data.data || data;
 }
 
-export async function fetchCreateService(token) {
+export async function fetchCreateService(token, type, price) {
   const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ type, price}),
+    body: JSON.stringify({ type, price }),
   });
 
   if (!response.ok) {
