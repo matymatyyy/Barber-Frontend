@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useServices } from "../hooks/useServices";
-import { getToken } from "../utils/storage";
+import { useServices } from "../../hooks/useServices";
 
 function ServiceUpdateForm({ service }) {
 

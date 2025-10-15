@@ -1,10 +1,11 @@
 import { useState } from "react";
 import ServiceUpdateForm from "./ServiceUpdateForm";
-import { useServices } from "../hooks/useServices";
+import { useServices } from "../../hooks/useServices";
 function ServiceCard({ service }) {
 
   const [isUpdateFormShown, setIsUpdateFormShown] = useState(true);
   const [isCreateFormShown, setIsCreateFormShown] = useState(false);
+
   
   const showUpdateForm = () => {
     if(isUpdateFormShown === true) {
@@ -24,17 +25,19 @@ function ServiceCard({ service }) {
   }
 
     const {services, error, updateServices, deleteService, createService} = useServices();
-    const [type, setType] = useState("");
+    const [type, setType] = useState("Corte");
     const [price, setPrice] = useState("");
   
     const serviceId = service.id;
+
   
     const handleUpdate = async (e) => {
       e.preventDefault();
-  
+      
+
       try {
         await updateServices (serviceId, type, price);
-        console.log("llegue aca");
+        console.log("llegue aqqqca");
       } catch (error) {
         console.error("hermoso error");
       }
@@ -43,10 +46,10 @@ function ServiceCard({ service }) {
 
     const handleCreate = async (e) => {
       e.preventDefault();
-  
+
       try {
         await createService (type, price);
-        console.log("llegue aca");
+        console.log("llegue aca2");
       } catch (error) {
         console.error("hermoso error");
       }
@@ -76,16 +79,16 @@ function ServiceCard({ service }) {
       (
         <>
         <form onSubmit={handleCreate}>
-          {/*<select onChange={(e) => setType(e.target.value) }>
-            <option value={type}>Corte</option>
-            <option value={type}>Tinte</option>
-          </select>*/}
-          <input 
+          <select onChange={(e) => setType(e.target.value) }>
+            <option value={"Corte"}>Corte</option>
+            <option value={"Tinte"}>Tinte</option>
+          </select>
+          {/*<input 
             type="text" 
             placeholder='tipo'
             value={type}
             onChange={(e) => setType(e.target.value)} 
-          />
+          />*/}
           <input 
             type="text" 
             placeholder='precio'
@@ -123,14 +126,12 @@ function ServiceCard({ service }) {
       :
       (
         <>
-        <form onSubmit={handleUpdate}>
+    <form onSubmit={handleUpdate}>
     <h3>
-      <input 
-        type="text" 
-        placeholder={service.type}
-        value={type}
-        onChange={(e) => setType(e.target.value)} 
-      />
+      <select onChange={(e) => setType(e.target.value) }>
+        <option value={"Corte"}>Corte</option>
+        <option value={"Tinte"}>Tinte</option>
+      </select>
     </h3>
     <p>
       <input 

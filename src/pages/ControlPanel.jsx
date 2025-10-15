@@ -4,7 +4,7 @@
 import { useServices } from "../hooks/useServices";
 import { useAuth } from "../hooks/useAuth";
 //components
-import ServiceList from "../components/ServiceList";
+import ServiceList from "../components/Service/ServiceList";
 import Spinner from "../components/Spinner";
 
 //utils
