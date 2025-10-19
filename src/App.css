@@ -25,6 +25,58 @@ body {
   background: #fff;
 }
 
+/* Estilos mejorados para FullCalendar */
+.fc {
+  font-family: "Lato", sans-serif;
+}
+
+.fc .fc-button-primary {
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.fc .fc-button-primary:hover {
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background: var(--dark);
+}
+
+/* Días clickeables en vista mensual */
+.fc-daygrid-day {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.fc-daygrid-day:hover {
+  background-color: rgba(158, 138, 120, 0.1);
+}
+
+/* Vista de horarios */
+.fc-timegrid-slot {
+  height: 3em;
+  cursor: pointer;
+}
+
+.fc-timegrid-slot:hover {
+  background-color: rgba(158, 138, 120, 0.05);
+}
+
+/* Eventos/turnos */
+.fc-event {
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.fc-event:hover {
+  opacity: 0.8;
+}
+
 /* Preloader */
 .preloader {
   position: fixed;

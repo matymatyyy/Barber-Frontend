@@ -10,6 +10,7 @@ export default function ReservationTurns() {
   const location = useLocation();
   const [preloaderVisible, setPreloaderVisible] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,9 +19,21 @@ export default function ReservationTurns() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleDateSelect = (info) => {
+  const handleDateClick = (info) => {
+    console.log('Día clickeado:', info.dateStr);
     setSelectedDate(info.dateStr);
-    console.log('Fecha seleccionada:', info);
+  };
+
+  const handleDateSelect = (info) => {
+    // Cuando selecciona un rango horario específico
+    console.log('Horario seleccionado:', {
+      start: info.startStr,
+      end: info.endStr
+    });
+    setSelectedTimeSlot({
+      start: info.startStr,
+      end: info.endStr
+    });
   };
 
   if (location.pathname !== '/reservation') {
@@ -34,25 +47,37 @@ export default function ReservationTurns() {
       
       <main style={{ marginTop: "80px", minHeight: "calc(100vh - 200px)" }}>
         <div className="container" style={{ padding: "4rem 2rem" }}>
-          <h1 style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
             Reserva tu Turno
           </h1>
           <p style={{ textAlign: "center", marginBottom: "3rem", color: "#666" }}>
-            Selecciona el día y horario que prefieras en el calendario
+            Haz clic en un día del mes para ver los horarios disponibles
           </p>
           
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-            <Calendar onDateSelect={handleDateSelect} />
+            <Calendar 
+              onDateClick={handleDateClick}
+              onDateSelect={handleDateSelect}
+            />
             
-            {selectedDate && (
+            {selectedTimeSlot && (
               <div style={{
                 marginTop: "2rem",
-                padding: "1rem",
-                background: "#f8f9fa",
-                borderRadius: "8px",
-                textAlign: "center"
+                padding: "2rem",
+                background: "linear-gradient(135deg, #f8f9fa, #e9ecef)",
+                borderRadius: "12px",
+                textAlign: "center",
+                border: "2px solid var(--accent)"
               }}>
-                <p>Fecha seleccionada: <strong>{selectedDate}</strong></p>
+                <h3 style={{ color: "var(--dark)", marginBottom: "1rem" }}>
+                  Horario Seleccionado
+                </h3>
+                <p style={{ fontSize: "1.1rem", marginBottom: "0.5rem" }}>
+                  <strong>Inicio:</strong> {new Date(selectedTimeSlot.start).toLocaleString('es-ES')}
+                </p>
+                <p style={{ fontSize: "1.1rem", marginBottom: "1.5rem" }}>
+                  <strong>Fin:</strong> {new Date(selectedTimeSlot.end).toLocaleString('es-ES')}
+                </p>
                 <button className="btn" style={{ marginTop: "1rem" }}>
                   <span>Confirmar Reserva</span>
                 </button>
