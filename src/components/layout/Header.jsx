@@ -40,7 +40,7 @@ export default function Header() {
           <li><a href="#contact" onClick={(e) => handleNavClick(e, "contact")}>Contacto</a></li>
         </ul>
 
-        <button className="menu-btn" onClick={() => navigate("/login")}>
+        <button className="menu-btn" onClick={() => navigate("/reservation")}>
           <span>Reservar Turno</span>
         </button>
         <button 
