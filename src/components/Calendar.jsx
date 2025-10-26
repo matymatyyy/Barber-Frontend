@@ -1,31 +1,74 @@
-import { useRef, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 
-export default function Calendar({ onDateSelect, onDateClick }) {
+export default function Calendar({ events, onDateSelect, onDateClick }) {
   const calendarRef = useRef(null);
 
+  useEffect(() => {
+    const styleId = 'calendar-hide-events-style';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        .fc-dayGridMonth-view .fc-event {
+          display: none !important;
+        }
+        .fc-timegrid .fc-scrollgrid-section-header {
+          display: none !important;
+        }
+        .fc-timegrid-slot {
+          cursor: not-allowed !important;
+          background: #f9f9f9;
+        }
+        .fc-event {
+          cursor: pointer;
+        }
+        .fc-event[data-ocupado="true"] {
+          cursor: not-allowed !important;
+          opacity: 0.7;
+        }
+        .fc-event:hover {
+          opacity: 0.8;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   const handleDateClick = (info) => {
-    // Si estamos en vista mensual, cambiar a vista diaria de ese día
     const calendarApi = calendarRef.current.getApi();
     
     if (calendarApi.view.type === 'dayGridMonth') {
       calendarApi.changeView('timeGridDay', info.dateStr);
     }
     
-    // Ejecutar callback personalizado si existe
     if (onDateClick) {
       onDateClick(info);
     }
   };
 
-  const handleSelect = (info) => {
-    // Para selección de rangos de tiempo
+  const handleEventClick = (clickInfo) => {
+    const event = clickInfo.event;
+    const isOcupado = event.extendedProps.state;
+    
+    if (isOcupado) {
+      alert('Este turno ya está ocupado. Por favor selecciona otro horario disponible.');
+      return;
+    }
+    
+    // Llamar a onDateSelect cuando se hace clic en un turno disponible
     if (onDateSelect) {
-      onDateSelect(info);
+      onDateSelect({
+        start: event.start,
+        end: event.end,
+        startStr: event.startStr,
+        endStr: event.endStr,
+        event: event
+      });
     }
   };
 
@@ -44,36 +87,24 @@ export default function Calendar({ onDateSelect, onDateClick }) {
         slotMinTime="08:00:00"
         slotMaxTime="20:00:00"
         slotDuration="00:30:00"
-        selectable={true}
-        selectMirror={true}
+        allDaySlot={false}
+        selectable={false}
+        selectMirror={false}
+        editable={false}
+        eventClick={handleEventClick}
         dayMaxEvents={true}
         weekends={true}
+        eventDisplay="block"
+        displayEventTime={true}
+        displayEventEnd={true}
         dateClick={handleDateClick}
-        select={handleSelect}
         height="auto"
         businessHours={{
           daysOfWeek: [1, 2, 3, 4, 5, 6],
           startTime: '09:00',
           endTime: '20:00',
         }}
-        events={[
-          // Turnos desde backend
-          { 
-            title: 'Ocupado', 
-            start: '2025-10-20T10:00:00',
-            end: '2025-10-20T10:30:00',
-            backgroundColor: '#999',
-            borderColor: '#999'
-          },
-          { 
-            title: 'Disponible', 
-            start: '2025-10-20T11:00:00',
-            end: '2025-10-20T11:30:00',
-            backgroundColor: 'var(--accent)',
-            borderColor: 'var(--accent)'
-          }
-        ]}
-        // Personalizar el texto de los botones
+        events={events || []}
         buttonText={{
           today: 'Hoy',
           month: 'Mes',
