@@ -6,9 +6,9 @@ import { getToken, removeToken } from "../utils/storage";
 
 export function useServices() {
   const [services, setServices] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingServices, setIsLoadingServices] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorServices, setErrorServices] = useState(null);
   const navigate = useNavigate();
 
 const searchServices = async () => {
@@ -19,14 +19,14 @@ const searchServices = async () => {
     return;
   }
 
-  setIsLoading(true);
-  setError(null);
+  setIsLoadingServices(true);
+  setErrorServices(null);
 
   try {
     const data = await fetchServices(token);
     setServices(data);
   } catch (err) {
-    setError(err.message);
+    setErrorServices(err.message);
     setServices([]);
     
     // Si el token es inválido, redirigir al login
@@ -35,7 +35,7 @@ const searchServices = async () => {
       navigate("/");
     }
   } finally {
-    setIsLoading(false);
+    setIsLoadingServices(false);
   }
 }
 
@@ -45,7 +45,7 @@ const updateServices = async (id, type, price) => {
     const data = await fetchUpdateService(token, id, type, price);
     setServices(data);
   } catch (err) {
-    setError(err.message);
+    setErrorServices(err.message);
       
       // Si el token es inválido, redirigir al login
       if (err.message.includes("inválido") || err.message.includes("expirada")) {
@@ -53,7 +53,7 @@ const updateServices = async (id, type, price) => {
         navigate("/");
       }
     } finally {
-      setIsLoading(false);
+      setIsLoadingServices(false);
     }
   }
 
@@ -65,14 +65,14 @@ const createService = async (type, price) => {
     const data = await fetchCreateService(token, type, price);
     setServices(prevServices => [...prevServices, data]);
   } catch (err) {
-    setError(err.message);
+    setErrorServices(err.message);
       
       if (err.message.includes("inválido") || err.message.includes("expirada")) {
         removeToken();
         navigate("/");
       }
     } finally {
-      setIsLoading(false);
+      setIsLoadingServices(false);
     }
   }
 
@@ -88,7 +88,7 @@ const deleteService = async (id) => {
     alert("Servicio eliminado exitosamente");
 
   } catch (err) {
-    setError(err.message);
+    setErrorServices(err.message);
       
       if (err.message.includes("inválido") || err.message.includes("expirada")) {
         removeToken();
@@ -101,13 +101,13 @@ const deleteService = async (id) => {
 
   const clearServices = () => {
     setServices([]);
-    setError(null);
+    setErrorServices(null);
   };
   
   return {
     services,
-    isLoading,
-    error,
+    isLoadingServices,
+    errorServices,
     searchServices,
     clearServices,
     updateServices,

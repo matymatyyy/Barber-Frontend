@@ -5,31 +5,70 @@ import { useServices } from "../hooks/useServices";
 import { useAuth } from "../hooks/useAuth";
 //components
 import ServiceList from "../components/Service/ServiceList";
+import TurnConfigDayList from "../components/TurnConfigDay/TurnConfigDayList";
 import Spinner from "../components/Spinner";
 
 //utils
 import { capitalize } from "../utils/formatters";
+import { useTurnConfigDays } from "../hooks/useTurnConfigDays";
+import { useEffect, useState } from "react";
 
 export default function ControlPanel() {
-  const { services, isLoading, error, searchServices } = useServices();
+  const [showContent, setShowContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const { services, isLoadingServices, errorServices, searchServices } = useServices();
+  const { turnConfigDay, isLoadingDays, errorDays, searchTurnConfigDays } = useTurnConfigDays();
   const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
   };
 
+  useEffect(() => {
+    if (isLoadingDays) {
+      setShowContent('days');
+      setIsLoading(true);
+    } else if (isLoadingServices) {
+      setShowContent('services');
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoadingDays, isLoadingServices])
+
+  const itemWrapper = () => {
+    if (isLoading) {
+      return <Spinner styles={styles} />
+    }
+    
+    if (showContent === 'days') {
+      return <TurnConfigDayList turnConfigDays={turnConfigDay} />
+    }
+
+    if (showContent === 'services') {
+      return <ServiceList services={services} />
+    }
+  };
+
   return (
     <div style={styles.container}>
       {/* Sidebar */}
       <div style={styles.sidebar}>
-        <h3 style={styles.sidebarTitle}>Menú</h3>
+        <h3 style={styles.sidebarTitle}>Menú</h3>        
         <div style={styles.buttonContainer}>
           <button 
             onClick={searchServices} 
-            disabled={isLoading}
+            disabled={isLoadingServices}
             style={styles.button}
           >
-            {isLoading ? "Buscando..." : "Servicios"}
+            {isLoadingServices ? "Buscando..." : "Servicios"}
+          </button>
+          <button 
+            onClick={searchTurnConfigDays} 
+            disabled={isLoadingDays}
+            style={styles.button}
+          >
+            {isLoadingDays ? "Buscando..." : "Dias"}
           </button>
           <button 
             onClick={handleLogout}
@@ -44,17 +83,20 @@ export default function ControlPanel() {
       <div style={styles.mainContent}>
         <h1 style={styles.welcomeTitle}>{capitalize("bienvenido")} 🎉</h1>
         
-        {error && (
+        {errorDays && (
           <div style={styles.error}>
-            {error}
+            {errorDays}
+          </div>
+        )}
+        {errorServices && (
+          <div style={styles.error}>
+            {errorServices}
           </div>
         )}
         
-        {isLoading ? (
-          <Spinner styles={styles} />
-        ) : (
-          <ServiceList services={services} />
-        )}
+        <div id="itemWrapper">
+          {itemWrapper()}
+        </div>
       </div>
     </div>
   );

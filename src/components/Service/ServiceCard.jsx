@@ -83,12 +83,6 @@ function ServiceCard({ service }) {
             <option value={"Corte"}>Corte</option>
             <option value={"Tinte"}>Tinte</option>
           </select>
-          {/*<input 
-            type="text" 
-            placeholder='tipo'
-            value={type}
-            onChange={(e) => setType(e.target.value)} 
-          />*/}
           <input 
             type="text" 
             placeholder='precio'

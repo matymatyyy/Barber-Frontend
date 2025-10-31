@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useServices } from "../../hooks/useServices";
-function TurnConfigDayCard({ service }) {
+import moment from "moment";
+import { useTurnConfigDays } from "../../hooks/useTurnConfigDays";
+function TurnConfigDayCard({ turnConfigDay }) {
 
   const [isUpdateFormShown, setIsUpdateFormShown] = useState(true);
   const [isCreateFormShown, setIsCreateFormShown] = useState(false);
@@ -22,18 +23,23 @@ function TurnConfigDayCard({ service }) {
     }
   }
 
-    const {services, error, updateServices, deleteService, createService} = useServices();
-    const [type, setType] = useState("");
-    const [price, setPrice] = useState("");
-  
-    const serviceId = service.id;
+    const {turnConfigDays, error, updateTurnConfigDay, deleteTurnConfigDay, createTurnConfigDay} = useTurnConfigDays();
+    const [day, setDay] = useState("Martes");
+    const [hourBegin, setHourBegin] = useState(new Date());
+    const [hourEnd, setHourEnd] = useState(new Date());
+    const [turnTime, setTurnTime] = useState(new Date());
+
+    const turnConfigDayId = turnConfigDay.id;
+    const turnConfigId = turnConfigDay.turnConfigId;
+
   
     const handleUpdate = async (e) => {
       e.preventDefault();
   
       try {
-        await updateServices (serviceId, type, price);
+        await updateTurnConfigDay (turnConfigDayId, turnConfigId, day, hourBegin, hourEnd, turnTime);
         console.log("llegue aca");
+        console.log(hourBegin, hourEnd, turnTime)
       } catch (error) {
         console.error("hermoso error");
       }
@@ -44,7 +50,7 @@ function TurnConfigDayCard({ service }) {
       e.preventDefault();
   
       try {
-        await createService (type, price);
+        await createTurnConfigDay (turnConfigId, day, hourBegin, hourEnd, turnTime);
         console.log("llegue aca");
       } catch (error) {
         console.error("hermoso error");
@@ -52,7 +58,7 @@ function TurnConfigDayCard({ service }) {
   
     }
 
-    const handleDeleteService = async () => {
+    const handleDeleteTurnConfigDay = async () => {
         const confirmDelete = window.confirm(
         "¿Estás seguro de que quieres eliminar este servicio? Esta acción no se puede deshacer."
       );
@@ -62,7 +68,7 @@ function TurnConfigDayCard({ service }) {
       }
 
       try {
-        await deleteService(serviceId);
+        await deleteTurnConfigDay(turnConfigDayId);
         console.log("llegue aca");
       } catch (error) {
         console.error("hermoso error");
@@ -75,10 +81,6 @@ function TurnConfigDayCard({ service }) {
       (
         <>
         <form onSubmit={handleCreate}>
-          {/*<select onChange={(e) => setType(e.target.value) }>
-            <option value={type}>Corte</option>
-            <option value={type}>Tinte</option>
-          </select>*/}
           <input 
             type="text" 
             placeholder='tipo'
@@ -113,33 +115,62 @@ function TurnConfigDayCard({ service }) {
       {isUpdateFormShown ?
       ( 
         <>
-        
-        <h3>{service.type}</h3>
-        <p>Precio: ${service.price}</p>
-        <p>ID: {service.id}</p>
+        {console.log(turnConfigDay)}
+        <h3>{turnConfigDay.day}</h3>
+        <p>Jornada: {moment(turnConfigDay.hourBegin.date).format("HH:mm")} -- {moment(turnConfigDay.hourEnd.date).format("HH:mm")}</p>
+        <p>Duracion de turnos: {moment(turnConfigDay.turnTime.date).format("HH:mm")}</p>
+        <p>ID Configuracion: {turnConfigDay.turnConfigId}</p>
+        <p>ID: {turnConfigDay.id}</p>
         </>
       )  
       :
       (
         <>
-        <form onSubmit={handleUpdate}>
+    <form onSubmit={handleUpdate}>
     <h3>
-      <input 
-        type="text" 
-        placeholder={service.type}
-        value={type}
-        onChange={(e) => setType(e.target.value)} 
-      />
+      <select onChange={(e) => setDay(e.target.value) }>
+        <option value={"Martes"}>Martes</option>
+        <option value={"Miercoles"}>Miercoles</option>
+        <option value={"Jueves"}>Jueves</option>
+        <option value={"Viernes"}>Viernes</option>
+        <option value={"Sabado"}>Sabado</option>
+      </select>
     </h3>
     <p>
+      <label>Inicio de jornada</label>
       <input 
-        type="text" 
-        placeholder={service.price}
-        value={price}
-        onChange={(e) => setPrice(e.target.value)}
+        type="time" 
+        placeholder={moment(turnConfigDay.hourBegin.date).format("HH:mm")}
+        min="00:00"
+        max="23:59"
+        value={hourBegin}
+        onChange={(e) => setHourBegin(e.target.value)}
+      />
+  </p> 
+  <p>
+      <label>Fin de jornada</label>
+      <input 
+        type="time" 
+        placeholder={moment(turnConfigDay.hourEnd.date).format("HH:mm")}   
+        min="00:00"
+        max="23:59"
+        value={hourEnd}
+        onChange={(e) => setHourEnd(e.target.value)}
+      />
+  </p> 
+  <p>
+      <label>Duracion de cada turno</label>
+      <input 
+        type="time" 
+        placeholder={moment(turnConfigDay.turnTime.date).format("HH:mm")}  
+        min="00:00"
+        max="01:00"
+        value={turnTime}
+        onChange={(e) => setTurnTime(e.target.value)}
       />
   </p>
-  <p>ID: {service.id}</p>
+        
+  <p>ID: {turnConfigDay.id}</p>
   <input 
   type="submit" 
   />
@@ -148,7 +179,7 @@ function TurnConfigDayCard({ service }) {
       )  
       } 
       <div /*style={styles.buttonSection}*/>
-        <button onClick={handleDeleteService}>
+        <button onClick={handleDeleteTurnConfigDay}>
           x
         </button>
         <button onClick={showUpdateForm}/*style={styles.editButton}*/>
