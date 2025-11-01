@@ -25,6 +25,22 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (location.pathname === '/' && location.state?.scrollTo) {
+      const scrollTimer = setTimeout(() => {
+        const element = document.getElementById(location.state.scrollTo);
+        if (element) {
+          const headerOffset = 80;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        }
+      }, 900);
+      
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [location]);
+
   const handleNavClick = (e, id) => {
     e.preventDefault();
     const element = document.getElementById(id);
@@ -36,7 +52,7 @@ export default function App() {
     }
   };
 
-  // Si estamos en una ruta hija (login, register, home), solo mostrar el Outlet
+  // Si estamos en una ruta hija (login, register, reservation), solo mostrar el Outlet
   if (location.pathname !== '/') {
     return <Outlet />;
   }

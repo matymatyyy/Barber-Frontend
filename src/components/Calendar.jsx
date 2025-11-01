@@ -85,7 +85,7 @@ export default function Calendar({ events, onDateSelect, onDateClick }) {
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         }}
         slotMinTime="08:00:00"
-        slotMaxTime="20:00:00"
+        slotMaxTime="22:00:00"
         slotDuration="00:30:00"
         allDaySlot={false}
         selectable={false}

@@ -94,25 +94,23 @@ export default function ReservationTurns() {
   const handleConfirmReservation = async (formData) => {
     const reservationData = {
       ...formData,
-      turnoId: selectedTimeSlot.eventId,
-      inicio: selectedTimeSlot.start,
-      fin: selectedTimeSlot.end
+      id: selectedTimeSlot.eventId,
+      id_client: 1
     };
 
     console.log('Confirmar reserva:', reservationData);
     
     try {
       // TODO: Descomentar cuando tengas el endpoint listo porque ahora no existe, ni ganas de hacer sabado a la noche...
-      // const response = await fetch('http://localhost:91/turns/reservation', {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(reservationData)
-      // });
-      // 
-      // if (!response.ok) {
-      //   throw new Error('Error al realizar la reserva');
-      // }
-
+      const response = await fetch('http://localhost:91/turns/reservation', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reservationData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al realizar la reserva');
+      }
       alert('¡Reserva confirmada con éxito!');
       handleCloseModal();
       fetchTurnos(); // Recargar turnos
