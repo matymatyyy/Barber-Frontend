@@ -1,45 +1,77 @@
+import { useState, useEffect } from "react";
 import SectionHeading from "../common/SectionHeading";
 
-const PRICING_DATA = [
-  {
-    category: "Estilismo de Cabello",
-    items: [
-      { name: "Corte de Cabello", desc: "Corte profesional adaptado a tu estilo.", price: "$8000" },
-      { name: "Peinado", desc: "Estilizado y acabado perfecto.", price: "$9000" },
-      { name: "Recorte", desc: "Mantenimiento y perfilado.", price: "$10000" }
-    ]
-  },
-  {
-    category: "Afeitado",
-    items: [
-      { name: "Afeitado Completo", desc: "Afeitado tradicional con toalla caliente.", price: "$8000" },
-      { name: "Recorte de Barba", desc: "Perfilado y mantenimiento de barba.", price: "$9000" },
-      { name: "Afeitado Suave", desc: "Acabado perfecto y cuidado de la piel.", price: "$10000" }
-    ]
-  }
-];
-
 export default function Pricing() {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:91/services');
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar los servicios');
+        }
+        
+        const result = await response.json();
+        setServices(result.data);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching services:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="bg-grey" id="pricing">
+        <div className="container">
+          <SectionHeading subtitle="Precios accesibles" title="Nuestros Precios" />
+          <div className="text-center">
+            <p>Cargando servicios...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="bg-grey" id="pricing">
+        <div className="container">
+          <SectionHeading subtitle="Precios accesibles" title="Nuestros Precios" />
+          <div className="text-center">
+            <p>Error: {error}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-grey" id="pricing">
       <div className="container">
         <SectionHeading subtitle="Precios accesibles" title="Nuestros Precios" />
 
         <div className="pricing-grid">
-          {PRICING_DATA.map((category, index) => (
-            <div key={index} className="price-wrap">
-              <h3>{category.category}</h3>
-              <ul className="price-list">
-                {category.items.map((item, idx) => (
-                  <li key={idx}>
-                    <h4>{item.name}</h4>
-                    <p>{item.desc}</p>
-                    <span className="price">{item.price}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="price-wrap">
+            <h3>Servicios de Barbería</h3>
+            <ul className="price-list">
+              {services.map((service) => (
+                <li key={service.id}>
+                  <h4>{service.type}</h4>
+                  <span className="price">${service.price}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
