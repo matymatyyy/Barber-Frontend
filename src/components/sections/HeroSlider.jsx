@@ -21,7 +21,7 @@ const SLIDES_DATA = [
   }
 ];
 
-export default function HeroSlider({ onNavClick }) {
+export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function HeroSlider({ onNavClick }) {
               <span key={i}>{line}{i < slide.title.split('\n').length - 1 && <br />}</span>
             ))}</h1>
             <p>{slide.description}</p>
-            <a href="#contact" className="btn" onClick={(e) => onNavClick(e, "contact")}>
+            <a href="/reservation" className="btn">
               <span>Reservar Turno</span>
             </a>
           </div>

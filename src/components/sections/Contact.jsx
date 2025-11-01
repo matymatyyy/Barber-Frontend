@@ -10,7 +10,7 @@ export default function Contact() {
         <SectionHeading subtitle="Reserva tu cita" title="Contáctanos" />
         <p style={{ fontSize: "1.2rem", marginBottom: "2rem" }}>Email: contacto@barbershop.com</p>
         <p style={{ fontSize: "1.2rem", marginBottom: "2rem" }}>Tel: +54 2352551599</p>
-        <button className="btn" onClick={() => navigate("/login")}>
+        <button className="btn" onClick={() => navigate("/reservation")}>
           <span>Reservar Turno Online</span>
         </button>
       </div>
