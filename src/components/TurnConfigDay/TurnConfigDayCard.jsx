@@ -39,9 +39,6 @@ function TurnConfigDayCard({ turnConfigDay }) {
       try {
         await updateTurnConfigDay (turnConfigDayId, turnConfigId, day, hourBegin, hourEnd, turnTime);
         console.log("llegue aca");
-        console.log(typeof hourBegin);
-        console.log(typeof hourEnd);
-        console.log(typeof turnTime);
       } catch (error) {
         console.error("hermoso error");
       }
@@ -83,18 +80,46 @@ function TurnConfigDayCard({ turnConfigDay }) {
       (
         <>
         <form onSubmit={handleCreate}>
-          <input 
-            type="text" 
-            placeholder='tipo'
-            value={type}
-            onChange={(e) => setType(e.target.value)} 
-          />
-          <input 
-            type="text" 
-            placeholder='precio'
-            value={price}
-            onChange={(e) => setPrice(e.target.value)} 
-          />
+          <h3>
+            <select onChange={(e) => setDay(e.target.value) }>
+              <option value={"Martes"}>Martes</option>
+              <option value={"Miercoles"}>Miercoles</option>
+              <option value={"Jueves"}>Jueves</option>
+              <option value={"Viernes"}>Viernes</option>
+              <option value={"Sabado"}>Sabado</option>
+            </select>
+          </h3>
+          <p>
+            <label>Inicio de jornada</label>
+            <input 
+              type="time" 
+              min="00:00"
+              max="23:59"
+              value={hourBegin}
+              onChange={(e) => setHourBegin(e.target.value)}
+            />
+          </p> 
+          <p>
+            <label>Fin de jornada</label>
+            <input 
+              type="time"  
+              min="00:00"
+              max="23:59"
+              value={hourEnd}
+              onChange={(e) => setHourEnd(e.target.value)}
+            />
+          </p> 
+          <p>
+            <label>Duracion de cada turno</label>
+            <input 
+              type="time" 
+              min="00:00"
+              max="01:00"
+              value={turnTime}
+              onChange={(e) => setTurnTime(e.target.value)}
+            />
+          </p>   
+          <p>ID: {turnConfigDay.id}</p>
           <input 
             type="submit" 
           />
