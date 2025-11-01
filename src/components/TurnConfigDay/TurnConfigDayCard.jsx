@@ -39,7 +39,9 @@ function TurnConfigDayCard({ turnConfigDay }) {
       try {
         await updateTurnConfigDay (turnConfigDayId, turnConfigId, day, hourBegin, hourEnd, turnTime);
         console.log("llegue aca");
-        console.log(hourBegin, hourEnd, turnTime)
+        console.log(typeof hourBegin);
+        console.log(typeof hourEnd);
+        console.log(typeof turnTime);
       } catch (error) {
         console.error("hermoso error");
       }

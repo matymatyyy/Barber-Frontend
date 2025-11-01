@@ -51,14 +51,15 @@ export async function fetchDeleteTurnConfigDay(token, id) {
   return data.data || data;
 }
 
-export async function fetchUpdateTurnConfigDay(token, id, idTurnConfig, day, hourBegin, hourEnd, turnTime) {
+export async function fetchUpdateTurnConfigDay(token, id, turnConfigId, day, hourBegin, hourEnd, turnTime) {
+  console.log(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}/${id}`);
   const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ idTurnConfig, day, hourBegin, hourEnd, turnTime }),
+    body: JSON.stringify({ turnConfigId, day, hourBegin, hourEnd, turnTime }),
   });
 
   if (!response.ok) {
@@ -69,14 +70,14 @@ export async function fetchUpdateTurnConfigDay(token, id, idTurnConfig, day, hou
   return data.data || data;
 }
 
-export async function fetchCreateTurnConfigDay(token, idTurnConfig, day, hourBegin, hourEnd, turnTime) {
+export async function fetchCreateTurnConfigDay(token, turnConfigId, day, hourBegin, hourEnd, turnTime) {
   const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ idTurnConfig, day, hourBegin, hourEnd, turnTime }),
+    body: JSON.stringify({ turnConfigId, day, hourBegin, hourEnd, turnTime }),
   });
 
   if (!response.ok) {

@@ -37,10 +37,10 @@ const searchTurnConfigDays = async () => {
   }
 }
 
-const updateTurnConfigDay = async (id, idTurnConfig, day, hour_begin, hour_end, turn_time ) => {
+const updateTurnConfigDay = async (id, idTurnConfig, day, hourBegin, hourEnd, turnTime ) => {
   const token = getToken();
   try {
-    const data = await fetchUpdateTurnConfigDay(token, id, idTurnConfig, day, hour_begin, hour_end, turn_time );
+    const data = await fetchUpdateTurnConfigDay(token, id, idTurnConfig, day, hourBegin, hourEnd, turnTime );
     setTurnConfigDays(data);
   } catch (err) {
     setErrorDays(err.message);
