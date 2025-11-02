@@ -21,7 +21,7 @@ export default function Login() {
       if (res.ok) {
         const data = await res.json();
         login(data.token); // guardamos JWT
-        navigate("/home");
+        navigate("/");
       } else {
         alert("Credenciales incorrectas");
       }

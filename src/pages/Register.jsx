@@ -5,16 +5,18 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [dni, setDni] = useState("");
+  const [cellphone, setCellphone] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:91/users", {
+      const res = await fetch("http://localhost:91/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, dni, cellphone }),
       });
 
       if (res.ok) {
@@ -51,6 +53,20 @@ export default function Register() {
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="dni"
+          value={dni}
+          onChange={(e) => setDni(e.target.value)}
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="cellphone"
+          value={cellphone}
+          onChange={(e) => setCellphone(e.target.value)}
         />
         <br />
         <button type="submit" style={{ marginTop: "10px" }}>Registrarse</button>

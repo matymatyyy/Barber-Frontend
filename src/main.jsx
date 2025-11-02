@@ -7,6 +7,7 @@ import App from './App';
 import Login from './pages/Login';
 import Register from './pages/Register'; 
 import Home from './pages/Home';
+import Reservation from './pages/ReservationTurns';
 
 import AdminLogin from './pages/AdminLogin';
 import ControlPanel from './pages/ControlPanel';
@@ -22,6 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<App />} />
         
         {/* Rutas independientes */}
+        <Route path="/reservation" element={<Reservation />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
