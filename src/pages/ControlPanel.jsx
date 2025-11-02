@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 //components
 import ServiceList from "../components/Service/ServiceList";
 import TurnConfigDayList from "../components/TurnConfigDay/TurnConfigDayList";
+import TurnList from "../components/Turn/TurnList";
 import Spinner from "../components/Spinner";
 
 //utils
@@ -97,6 +98,7 @@ export default function ControlPanel() {
         <div id="itemWrapper">
           {itemWrapper()}
         </div>
+        <TurnList/>
       </div>
     </div>
   );
