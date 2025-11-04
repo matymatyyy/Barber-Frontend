@@ -5,7 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 
-export default function Calendar({ events, onDateSelect, onDateClick }) {
+export default function Calendar({ events, onDateSelect, onDateClick, isLoggedIn }) {
   const calendarRef = useRef(null);
 
   useEffect(() => {
@@ -34,6 +34,19 @@ export default function Calendar({ events, onDateSelect, onDateClick }) {
         .fc-event:hover {
           opacity: 0.8;
         }
+        .calendar-not-logged {
+          position: relative;
+        }
+        .calendar-not-logged::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.3);
+          pointer-events: none;
+        }
       `;
       document.head.appendChild(style);
     }
@@ -55,6 +68,11 @@ export default function Calendar({ events, onDateSelect, onDateClick }) {
     const event = clickInfo.event;
     const isOcupado = event.extendedProps.state;
     
+    if (!isLoggedIn) {
+      alert('Debes iniciar sesión para reservar un turno');
+      return;
+    }
+    
     if (isOcupado) {
       alert('Este turno ya está ocupado. Por favor selecciona otro horario disponible.');
       return;
@@ -73,7 +91,7 @@ export default function Calendar({ events, onDateSelect, onDateClick }) {
   };
 
   return (
-    <div style={styles.calendarContainer}>
+    <div style={styles.calendarContainer} className={!isLoggedIn ? 'calendar-not-logged' : ''}>
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

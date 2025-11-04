@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, Outlet } from "react-router-dom";
+import { useLocation, Outlet, useNavigate } from "react-router-dom";
 import "../App.css";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
@@ -9,12 +9,20 @@ import ReservationModal from "../components/ReservationModal";
 
 export default function ReservationTurns() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [preloaderVisible, setPreloaderVisible] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Verificar autenticación
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const formatBackendDataToEvents = (backendData) => {
     return backendData.data.map(turno => {
@@ -70,6 +78,12 @@ export default function ReservationTurns() {
   };
 
   const handleDateSelect = (info) => {
+    if (!isLoggedIn) {
+      alert('Debes iniciar sesión para reservar un turno');
+      navigate('/login');
+      return;
+    }
+
     console.log('Horario seleccionado:', {
       start: info.startStr || info.start.toISOString(),
       end: info.endStr || info.end.toISOString()
@@ -91,17 +105,35 @@ export default function ReservationTurns() {
     setSelectedTimeSlot(null);
   };
 
-  const handleConfirmReservation = async (formData) => {
+  const handleConfirmReservation = async (paymentData) => {
     const reservationData = {
-      ...formData,
       id: selectedTimeSlot.eventId,
-      id_client: 1
+      id_client: 1,
+      paymentMethod: paymentData.paymentMethod, // 'cash' o 'mercadopago'
     };
 
     console.log('Confirmar reserva:', reservationData);
-    
+    //PARTE DE MERCADO PAGO INCONPLETO, NO FUNCA PERO HAY QUE VERLO AL DETALLE
     try {
-      // TODO: Descomentar cuando tengas el endpoint listo porque ahora no existe, ni ganas de hacer sabado a la noche...
+      // Si el método es Mercado Pago, primero procesamos el pago
+      if (paymentData.paymentMethod === 'mercadopago') {
+        // TODO: Integrar con Mercado Pago API
+        // const mpResponse = await fetch('http://localhost:91/mercadopago/create-preference', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({
+        //     turnId: selectedTimeSlot.eventId,
+        //     amount: 5000, // Monto del servicio
+        //   })
+        // });
+        // const mpData = await mpResponse.json();
+        // window.location.href = mpData.init_point; // Redirigir a Mercado Pago
+        
+        alert('Redirigiendo a Mercado Pago... (Por implementar)');
+        return;
+      }
+      
+      // Si es efectivo, confirmar la reserva directamente
       const response = await fetch('http://localhost:91/turns/reservation', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -111,7 +143,8 @@ export default function ReservationTurns() {
       if (!response.ok) {
         throw new Error('Error al realizar la reserva');
       }
-      alert('¡Reserva confirmada con éxito!');
+      
+      alert('¡Reserva confirmada con éxito! Pagarás en efectivo en el local.');
       handleCloseModal();
       fetchTurnos(); // Recargar turnos
     } catch (error) {
@@ -134,9 +167,23 @@ export default function ReservationTurns() {
           <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
             Reserva tu Turno
           </h1>
-          <p style={{ textAlign: "center", marginBottom: "3rem", color: "#666" }}>
+          <p style={{ textAlign: "center", marginBottom: "1rem", color: "#666" }}>
             Haz clic en un día del mes para ver los horarios disponibles, luego selecciona un turno verde (disponible)
           </p>
+          {!isLoggedIn && (
+            <div style={{ 
+              textAlign: "center", 
+              marginBottom: "2rem",
+              padding: "1rem",
+              backgroundColor: "#fff3cd",
+              borderRadius: "8px",
+              border: "1px solid #ffc107"
+            }}>
+              <p style={{ margin: 0, color: "#856404" }}>
+                ⚠️ Debes <strong>iniciar sesión</strong> para poder reservar un turno
+              </p>
+            </div>
+          )}
           
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             {loading ? (
@@ -148,6 +195,7 @@ export default function ReservationTurns() {
                 events={turnos}
                 onDateClick={handleDateClick}
                 onDateSelect={handleDateSelect}
+                isLoggedIn={isLoggedIn}
               />
             )}
           </div>

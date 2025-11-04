@@ -11,6 +11,7 @@ import Reservation from './pages/ReservationTurns';
 
 import AdminLogin from './pages/AdminLogin';
 import ControlPanel from './pages/ControlPanel';
+import LocationPage from './pages/Location';
 
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         
         {/* Rutas independientes */}
         <Route path="/reservation" element={<Reservation />} />
+        <Route path="/ubicacion" element={<LocationPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route

@@ -8,8 +8,8 @@ export default function About() {
             <h2>La Barbería<br />Desde 2025</h2>
             <p>Un barbero es una persona cuya ocupación principal es cortar, vestir, arreglar y afeitar el cabello de hombres y niños. El lugar de trabajo de un barbero se conoce como "barbería". Las barberías también son lugares de interacción social y discusión.</p>
             <p>En algunos casos, las barberías también son foros públicos donde se discuten temas de actualidad y se comparten experiencias que fortalecen la comunidad.</p>
-            <a href="/info" className="btn">
-              <span>Más sobre nosotros</span>
+            <a href="/ubicacion" className="btn">
+              <span>Nuestra ubicacion</span>
             </a>
           </div>
 
