@@ -17,11 +17,17 @@ export default function ReservationTurns() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userId, setUserId] = useState(null);
 
   // Verificar autenticación
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const email = localStorage.getItem('userEmail');
+    const id = localStorage.getItem('userId');
     setIsLoggedIn(!!token);
+    setUserEmail(email || '');
+    setUserId(id ? parseInt(id) : null);
   }, []);
 
   const formatBackendDataToEvents = (backendData) => {
@@ -89,14 +95,12 @@ export default function ReservationTurns() {
       end: info.endStr || info.end.toISOString()
     });
     
-    // Guardar el turno seleccionado
     setSelectedTimeSlot({
       start: info.startStr || info.start.toISOString(),
       end: info.endStr || info.end.toISOString(),
       eventId: info.event?.id
     });
     
-    // Abrir el modal automáticamente
     setShowModal(true);
   };
 
@@ -106,30 +110,54 @@ export default function ReservationTurns() {
   };
 
   const handleConfirmReservation = async (paymentData) => {
+    const testUserId = userId || 1;
+    const testUserEmail = userEmail || 'test@test.com';
+    const token = localStorage.getItem('token');
+    
+    if (!testUserEmail || !testUserId || !token) {
+      alert('Error: No se pudo identificar al usuario. Por favor inicia sesión.');
+      return;
+    }
+
     const reservationData = {
       id: selectedTimeSlot.eventId,
-      id_client: 1,
-      paymentMethod: paymentData.paymentMethod, // 'cash' o 'mercadopago'
+      token: token,
+      paymentMethod: paymentData.paymentMethod,
     };
 
     console.log('Confirmar reserva:', reservationData);
-    //PARTE DE MERCADO PAGO INCONPLETO, NO FUNCA PERO HAY QUE VERLO AL DETALLE
+
     try {
-      // Si el método es Mercado Pago, primero procesamos el pago
       if (paymentData.paymentMethod === 'mercadopago') {
-        // TODO: Integrar con Mercado Pago API
-        // const mpResponse = await fetch('http://localhost:91/mercadopago/create-preference', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     turnId: selectedTimeSlot.eventId,
-        //     amount: 5000, // Monto del servicio
-        //   })
-        // });
-        // const mpData = await mpResponse.json();
-        // window.location.href = mpData.init_point; // Redirigir a Mercado Pago
+        console.log('Enviando datos a MP:', {
+          turnId: selectedTimeSlot.eventId,
+          clientId: testUserId,
+          clientEmail: testUserEmail,
+          amount: 5000
+        });
         
-        alert('Redirigiendo a Mercado Pago... (Por implementar)');
+        const mpResponse = await fetch('http://localhost:91/mercadopago/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            turnId: selectedTimeSlot.eventId,
+            clientId: testUserId,
+            amount: 5000,
+            title: 'Reserva de Turno - Barbería',
+            description: `Turno del ${new Date(selectedTimeSlot.start).toLocaleString('es-AR')}`,
+            clientEmail: testUserEmail
+          })
+        });
+        
+        if (!mpResponse.ok) {
+          throw new Error('Error al crear preferencia de Mercado Pago');
+        }
+        
+        const mpData = await mpResponse.json();
+        
+        localStorage.setItem('pendingTurnId', selectedTimeSlot.eventId);
+        
+        window.location.href = mpData.checkout_url || mpData.sandbox_init_point;
         return;
       }
       
@@ -146,7 +174,7 @@ export default function ReservationTurns() {
       
       alert('¡Reserva confirmada con éxito! Pagarás en efectivo en el local.');
       handleCloseModal();
-      fetchTurnos(); // Recargar turnos
+      fetchTurnos();
     } catch (error) {
       console.error('Error al confirmar reserva:', error);
       alert('Error al confirmar la reserva. Por favor intenta nuevamente.');
