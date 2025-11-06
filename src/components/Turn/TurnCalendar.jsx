@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation, Outlet } from "react-router-dom";
 import "../../App.css";
 import Calendar from "../../components/Calendar";
-import ReservationModal from "../../components/ReservationModal";
 import { useTurns } from "../../hooks/useTurns";
 
 function TurnCard ({ turno }) {
@@ -78,11 +77,6 @@ function TurnCard ({ turno }) {
         </div>
       </main>
 
-      <ReservationModal
-        isOpen={showModal}
-        onClose={handleCloseModal}
-        selectedTimeSlot={selectedTimeSlot}
-      />
     </>
   )
 }
