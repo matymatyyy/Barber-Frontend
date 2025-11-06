@@ -22,7 +22,7 @@ export default function Footer() {
 
           <div className="footer-widget">
             <h3>Horarios de Atención</h3>
-            <p>Lunes - Viernes: 11:30am - 8:00pm<br />Sábado - Domingo: 9am - 8pm</p>
+            <p>Martes - Sabado: 11:30am - 8:00pm<br />Sábado - Domingo: 9am - 8pm</p>
           </div>
         </div>
 

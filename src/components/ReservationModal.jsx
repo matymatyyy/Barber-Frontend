@@ -1,43 +1,146 @@
+import { useState } from 'react';
+
 export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, onConfirm }) {
+  const [paymentMethod, setPaymentMethod] = useState(''); // 'cash' o 'mercadopago'
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+
   if (!isOpen || !selectedTimeSlot) return null;
 
-  const handleConfirm = () => {
-    onConfirm();
+  const handleInitialConfirm = () => {
+    setShowPaymentOptions(true);
+  };
+
+  const handlePaymentSelection = (method) => {
+    setPaymentMethod(method);
+  };
+
+  const handleFinalConfirm = () => {
+    if (!paymentMethod) {
+      alert('Por favor selecciona un método de pago');
+      return;
+    }
+
+    // Pasar el método de pago al componente padre
+    onConfirm({ paymentMethod });
+    
+    // Resetear el modal
+    setShowPaymentOptions(false);
+    setPaymentMethod('');
+  };
+
+  const handleClose = () => {
+    setShowPaymentOptions(false);
+    setPaymentMethod('');
+    onClose();
   };
 
   return (
-    <div style={styles.modalOverlay} onClick={onClose}>
+    <div style={styles.modalOverlay} onClick={handleClose}>
       <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-        <button style={styles.closeButton} onClick={onClose}>
+        <button style={styles.closeButton} onClick={handleClose}>
           ×
         </button>
         
-        <h2 style={styles.modalTitle}>¿Confirmar Reserva?</h2>
-        
-        <div style={styles.appointmentInfo}>
-          <p><strong>Fecha y Hora:</strong></p>
-          <p>{new Date(selectedTimeSlot.start).toLocaleString('es-ES')}</p>
-          <p style={{ marginTop: '0.5rem' }}>
-            <strong>Duración:</strong> {new Date(selectedTimeSlot.start).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - {new Date(selectedTimeSlot.end).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-          </p>
-        </div>
+        {!showPaymentOptions ? (
+          // Vista inicial - Confirmar turno
+          <>
+            <h2 style={styles.modalTitle}>¿Confirmar Reserva?</h2>
+            
+            <div style={styles.appointmentInfo}>
+              <p><strong>Fecha y Hora:</strong></p>
+              <p>{new Date(selectedTimeSlot.start).toLocaleString('es-ES')}</p>
+              <p style={{ marginTop: '0.5rem' }}>
+                <strong>Duración:</strong> {new Date(selectedTimeSlot.start).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - {new Date(selectedTimeSlot.end).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
 
-        <div style={styles.modalButtons}>
-          <button
-            type="button"
-            onClick={onClose}
-            style={styles.cancelButton}
-          >
-            No, Cancelar
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            style={styles.confirmButton}
-          >
-            Sí, Confirmar
-          </button>
-        </div>
+            <div style={styles.modalButtons}>
+              <button
+                type="button"
+                onClick={handleClose}
+                style={styles.cancelButton}
+              >
+                No, Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleInitialConfirm}
+                style={styles.confirmButton}
+              >
+                Sí, Continuar
+              </button>
+            </div>
+          </>
+        ) : (
+          // Vista de selección de pago
+          <>
+            <h2 style={styles.modalTitle}>Método de Pago</h2>
+            
+            <p style={styles.paymentDescription}>
+              Selecciona cómo deseas pagar tu servicio:
+            </p>
+
+            <div style={styles.paymentOptions}>
+              {/* Opción Efectivo */}
+              <div 
+                style={{
+                  ...styles.paymentCard,
+                  ...(paymentMethod === 'cash' ? styles.paymentCardSelected : {})
+                }}
+                onClick={() => handlePaymentSelection('cash')}
+              >
+                <div style={styles.paymentIcon}>💵</div>
+                <h3 style={styles.paymentTitle}>Efectivo en el Local</h3>
+                <p style={styles.paymentText}>
+                  Paga cuando llegues a tu cita
+                </p>
+                {paymentMethod === 'cash' && (
+                  <div style={styles.checkmark}>✓</div>
+                )}
+              </div>
+
+              {/* Opción Mercado Pago */}
+              <div 
+                style={{
+                  ...styles.paymentCard,
+                  ...(paymentMethod === 'mercadopago' ? styles.paymentCardSelected : {})
+                }}
+                onClick={() => handlePaymentSelection('mercadopago')}
+              >
+                <div style={styles.paymentIcon}>💳</div>
+                <h3 style={styles.paymentTitle}>Mercado Pago</h3>
+                <p style={styles.paymentText}>
+                  Paga ahora de forma segura
+                </p>
+                {paymentMethod === 'mercadopago' && (
+                  <div style={styles.checkmark}>✓</div>
+                )}
+              </div>
+            </div>
+
+            <div style={styles.modalButtons}>
+              <button
+                type="button"
+                onClick={() => setShowPaymentOptions(false)}
+                style={styles.cancelButton}
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                onClick={handleFinalConfirm}
+                style={{
+                  ...styles.confirmButton,
+                  opacity: paymentMethod ? 1 : 0.5,
+                  cursor: paymentMethod ? 'pointer' : 'not-allowed'
+                }}
+                disabled={!paymentMethod}
+              >
+                Confirmar Reserva
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -61,7 +164,7 @@ const styles = {
     backgroundColor: '#fff',
     borderRadius: '16px',
     padding: '2.5rem',
-    maxWidth: '500px',
+    maxWidth: '600px',
     width: '90%',
     maxHeight: '90vh',
     overflowY: 'auto',
@@ -100,6 +203,64 @@ const styles = {
     marginBottom: '2rem',
     textAlign: 'center',
     border: '2px solid #daa520',
+  },
+  paymentDescription: {
+    textAlign: 'center',
+    color: '#666',
+    marginBottom: '2rem',
+    fontSize: '1rem',
+  },
+  paymentOptions: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '1rem',
+    marginBottom: '2rem',
+  },
+  paymentCard: {
+    position: 'relative',
+    padding: '1.5rem',
+    border: '2px solid #ddd',
+    borderRadius: '12px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    textAlign: 'center',
+    backgroundColor: '#fff',
+  },
+  paymentCardSelected: {
+    borderColor: '#daa520',
+    backgroundColor: '#fffbf0',
+    transform: 'scale(1.05)',
+    boxShadow: '0 4px 20px rgba(218, 165, 32, 0.3)',
+  },
+  paymentIcon: {
+    fontSize: '3rem',
+    marginBottom: '0.5rem',
+  },
+  paymentTitle: {
+    fontSize: '1.1rem',
+    fontWeight: 'bold',
+    marginBottom: '0.5rem',
+    color: '#333',
+  },
+  paymentText: {
+    fontSize: '0.9rem',
+    color: '#666',
+    margin: 0,
+  },
+  checkmark: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    backgroundColor: '#daa520',
+    color: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
   },
   modalButtons: {
     display: 'flex',

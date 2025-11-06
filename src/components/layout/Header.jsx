@@ -6,6 +6,7 @@ export default function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [headerScrolled, setHeaderScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,18 +16,33 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+
+    window.addEventListener('storage', checkAuth);
+
+    window.addEventListener('authChange', checkAuth);
+
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth);
+    };
+  }, []);
+
   const handleNavClick = (e, id) => {
     e.preventDefault();
     setMobileMenuOpen(false);
 
-    // Verificar si estamos en el home
     const isHome = location.pathname === '/';
 
     if (!isHome) {
-      // Si NO estamos en home, navegar y pasar el ID como state
       navigate('/', { state: { scrollTo: id } });
     } else {
-      // Si YA estamos en home, hacer scroll directo
       const element = document.getElementById(id);
       if (element) {
         const headerOffset = 80;
@@ -34,6 +50,14 @@ export default function Header() {
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       }
+    }
+  };
+
+  const handleAuthButtonClick = () => {
+    if (isLoggedIn) {
+      navigate("/reservation");
+    } else {
+      navigate("/login");
     }
   };
 
@@ -54,8 +78,8 @@ export default function Header() {
           <li><a href="#contact" onClick={(e) => handleNavClick(e, "contact")}>Contacto</a></li>
         </ul>
 
-        <button className="menu-btn" onClick={() => navigate("/reservation")}>
-          <span>Reservar Turno</span>
+        <button className="menu-btn" onClick={handleAuthButtonClick}>
+          <span>{isLoggedIn ? "Reservar Turno" : "Iniciar Sesión"}</span>
         </button>
         <button 
           className="mobile-toggle" 
