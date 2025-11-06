@@ -2,7 +2,7 @@ import ServiceCard from "./ServiceCard";
 
 export default function ServiceList({ services }) {
   if (!services || services.length === 0) {
-    return <p>No se encontraron dominios</p>;
+    return <p>No se encontraron servicios</p>;
   }
 
   return (

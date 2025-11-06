@@ -1,8 +1,7 @@
-// services/domainService.js
 import { API_BASE_URL, API_ENDPOINTS } from "../utils/constants";
 
-export async function fetchServices(token) {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}`, {
+export async function fetchTurnConfigDays(token) {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -18,8 +17,8 @@ export async function fetchServices(token) {
   return data.data || data;
 }
 
-export async function fetchSingularService(token, id) {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}${id}`, {
+export async function fetchSingularTurnConfigDay(token, id) {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -35,8 +34,8 @@ export async function fetchSingularService(token, id) {
   return data.data || data;
 }
 
-export async function fetchDeleteService(token, id) {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}${id}`, {
+export async function fetchDeleteTurnConfigDay(token, id) {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -52,14 +51,15 @@ export async function fetchDeleteService(token, id) {
   return data.data || data;
 }
 
-export async function fetchUpdateService(token, id, type, price) {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}${id}`, {
+export async function fetchUpdateTurnConfigDay(token, id, turnConfigId, day, hourBegin, hourEnd, turnTime) {
+  console.log(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}/${id}`);
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ type, price }),
+    body: JSON.stringify({ turnConfigId, day, hourBegin, hourEnd, turnTime }),
   });
 
   if (!response.ok) {
@@ -70,14 +70,14 @@ export async function fetchUpdateService(token, id, type, price) {
   return data.data || data;
 }
 
-export async function fetchCreateService(token, type, price) {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.SERVICES}`, {
+export async function fetchCreateTurnConfigDay(token, turnConfigId, day, hourBegin, hourEnd, turnTime) {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.TURNCONFIGDAY}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": token,
     },
-    body: JSON.stringify({ type, price }),
+    body: JSON.stringify({ turnConfigId, day, hourBegin, hourEnd, turnTime }),
   });
 
   if (!response.ok) {

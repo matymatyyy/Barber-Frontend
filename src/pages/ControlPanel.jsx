@@ -1,35 +1,93 @@
-// pages/HomePage.jsx
+// pages/ControlPanel.jsx
 
 //hooks
 import { useServices } from "../hooks/useServices";
 import { useAuth } from "../hooks/useAuth";
+import { useTurnConfigDays } from "../hooks/useTurnConfigDays";
+import { useTurns } from "../hooks/useTurns";
+import { useEffect, useState } from "react";
+
 //components
-import ServiceList from "../components/ServiceList";
+import ServiceList from "../components/Service/ServiceList";
+import TurnConfigDayList from "../components/TurnConfigDay/TurnConfigDayList";
+import TurnCalendar from "../components/Turn/TurnCalendar";
 import Spinner from "../components/Spinner";
 
 //utils
 import { capitalize } from "../utils/formatters";
 
-export default function HomePage() {
-  const { services, isLoading, error, searchServices } = useServices();
+export default function ControlPanel() {
+  const [showContent, setShowContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const { services, isLoadingServices, errorServices, searchServices } = useServices();
+  const { turnConfigDay, isLoadingDays, errorDays, searchTurnConfigDays } = useTurnConfigDays();
+  const { turnos, isLoadingTurns, errorTurns, searchTurnos } = useTurns();
   const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
   };
 
+  useEffect(() => {
+    if (isLoadingDays) {
+      setShowContent('days');
+      setIsLoading(true);
+    } else if (isLoadingServices) {
+      setShowContent('services');
+      setIsLoading(true);
+    } else if (isLoadingTurns) {
+      setShowContent('turns');
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoadingDays, isLoadingServices, isLoadingTurns])
+
+  const itemWrapper = () => {
+    if (isLoading) {
+      return <Spinner styles={styles} />
+    }
+    
+    if (showContent === 'days') {
+      return <TurnConfigDayList turnConfigDays={turnConfigDay} />
+    }
+
+    if (showContent === 'services') {
+      return <ServiceList services={services} />
+    }
+
+    if (showContent === 'turns') {
+      return <TurnCalendar />
+    }
+  };
+
   return (
     <div style={styles.container}>
       {/* Sidebar */}
       <div style={styles.sidebar}>
-        <h3 style={styles.sidebarTitle}>Menú</h3>
+        <h3 style={styles.sidebarTitle}>Menú</h3>        
         <div style={styles.buttonContainer}>
           <button 
             onClick={searchServices} 
-            disabled={isLoading}
+            disabled={isLoadingServices}
             style={styles.button}
           >
-            {isLoading ? "Buscando..." : "Search"}
+            {isLoadingServices ? "Buscando..." : "Servicios"}
+          </button>
+          <button 
+            onClick={searchTurnConfigDays} 
+            disabled={isLoadingDays}
+            style={styles.button}
+          >
+            {isLoadingDays ? "Buscando..." : "Dias"}
+          </button>
+          <button 
+            onClick={searchTurnos} 
+            disabled={isLoadingTurns}
+            style={styles.button}
+          >
+            {isLoadingTurns ? "Buscando..." : "Turnos"}
           </button>
           <button 
             onClick={handleLogout}
@@ -43,18 +101,27 @@ export default function HomePage() {
       {/* Contenido principal */}
       <div style={styles.mainContent}>
         <h1 style={styles.welcomeTitle}>{capitalize("bienvenido")} 🎉</h1>
-        
-        {error && (
+
+        {errorDays && (
           <div style={styles.error}>
-            {error}
+            {errorDays}
           </div>
         )}
-        
-        {isLoading ? (
-          <Spinner styles={styles} />
-        ) : (
-          <ServiceList services={services} />
+        {errorServices && (
+          <div style={styles.error}>
+            {errorServices}
+          </div>
         )}
+        {errorTurns && (
+          <div style={styles.error}>
+            {errorTurns}
+          </div>
+        )}
+
+        
+        <div id="itemWrapper">
+          {itemWrapper()}
+        </div>
       </div>
     </div>
   );
@@ -103,12 +170,6 @@ const styles = {
     border: "1px solid #f5c6cb",
     borderRadius: "4px",
     marginBottom: "20px"
-  },
-  welcomeTitle: {
-    color: '#2c3e50',
-    marginBottom: '20px',
-    fontSize: '28px',
-    fontWeight: '300'
   },
   overlay: {
     display: 'flex',

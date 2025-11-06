@@ -5,7 +5,8 @@ export const API_ENDPOINTS = {
   LOGIN: "/login",
   REGISTER: '/register',
   LOGINADMIN: "/login/admin",
-  SERVICES: "/services"
+  SERVICES: "/services",
+  TURNCONFIGDAY: "/turns_config_day"
 };
 
 export const MESSAGES = {
