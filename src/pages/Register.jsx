@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// Asegúrate de importar Link
+import { useNavigate, Link } from "react-router-dom"; 
+
+// Importa el CSS local
+import './Register.css'; 
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -31,46 +35,64 @@ export default function Register() {
     }
   };
 
+  //  ESTILO PARA FORZAR EL FONDO DE PANTALLA OSCURO
+  const fullScreenDarkStyle = {
+    backgroundColor: '#222227', // El color --dark de tu paleta
+    minHeight: '100vh',         // Ocupa toda la altura de la pantalla
+    display: 'flex',            // Para centrar el formulario
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',              // Ocupa todo el ancho
+  };
+
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Registro</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="nombre"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        /><br></br>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="dni"
-          value={dni}
-          onChange={(e) => setDni(e.target.value)}
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="cellphone"
-          value={cellphone}
-          onChange={(e) => setCellphone(e.target.value)}
-        />
-        <br />
-        <button type="submit" style={{ marginTop: "10px" }}>Registrarse</button>
-      </form>
+    //  Div que aplica el fondo de pantalla oscuro
+    <div style={fullScreenDarkStyle}> 
+      {/* Contenedor del formulario con la clase .register-container */}
+      <div className="register-container">
+        <h2>Registro</h2>
+        <form onSubmit={handleRegister}>
+          <input
+            type="text"
+            placeholder="Nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          {/* <br> ELIMINADO */}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {/* <br /> ELIMINADO */}
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {/* <br /> ELIMINADO */}
+          <input
+            type="text"
+            placeholder="DNI"
+            value={dni}
+            onChange={(e) => setDni(e.target.value)}
+          />
+          {/* <br /> ELIMINADO */}
+          <input
+            type="text"
+            placeholder="Teléfono"
+            value={cellphone}
+            onChange={(e) => setCellphone(e.target.value)}
+          />
+          {/* <br /> ELIMINADO */}
+          <button type="submit" className="register-button">Registrarse</button>
+        </form>
+         <p className="login-link-text">
+          ¿Ya tienes cuenta? <Link to="/login">Inicia Sesión</Link>
+        </p>
+      </div>
     </div>
   );
 }

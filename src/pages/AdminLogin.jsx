@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+import './AdminLogin.css'; 
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,29 +33,36 @@ export default function Login() {
     }
   };
 
+  //  CAMBIO CLAVE: Color de fondo más claro (#303030 vs #222227 en Login.jsx)
+  const fullScreenDarkStyle = {
+    backgroundColor: '#303030', 
+    minHeight: '100vh',         
+    display: 'flex',            
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',              
+  };
+
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <button type="submit" style={{ marginTop: "10px" }}>Entrar</button>
-      </form>
-      {/*<p style={{ marginTop: "15px" }}>
-        ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
-      </p>*/}
+    <div style={fullScreenDarkStyle}> 
+      <div className="admin-login-container">
+        <h2>Admin Login</h2>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit" className="admin-login-button">Entrar</button>
+        </form>
+      </div>
     </div>
   );
 }
