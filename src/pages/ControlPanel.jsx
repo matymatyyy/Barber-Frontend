@@ -1,24 +1,28 @@
-// pages/HomePage.jsx
+// pages/ControlPanel.jsx
 
 //hooks
 import { useServices } from "../hooks/useServices";
 import { useAuth } from "../hooks/useAuth";
+import { useTurnConfigDays } from "../hooks/useTurnConfigDays";
+import { useTurns } from "../hooks/useTurns";
+import { useEffect, useState } from "react";
+
 //components
 import ServiceList from "../components/Service/ServiceList";
 import TurnConfigDayList from "../components/TurnConfigDay/TurnConfigDayList";
-import TurnList from "../components/Turn/TurnList";
+import TurnCalendar from "../components/Turn/TurnCalendar";
 import Spinner from "../components/Spinner";
 
 //utils
 import { capitalize } from "../utils/formatters";
-import { useTurnConfigDays } from "../hooks/useTurnConfigDays";
-import { useEffect, useState } from "react";
 
 export default function ControlPanel() {
   const [showContent, setShowContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  
   const { services, isLoadingServices, errorServices, searchServices } = useServices();
   const { turnConfigDay, isLoadingDays, errorDays, searchTurnConfigDays } = useTurnConfigDays();
+  const { turnos, isLoadingTurns, errorTurns, searchTurnos } = useTurns();
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -32,10 +36,13 @@ export default function ControlPanel() {
     } else if (isLoadingServices) {
       setShowContent('services');
       setIsLoading(true);
+    } else if (isLoadingTurns) {
+      setShowContent('turns');
+      setIsLoading(true);
     } else {
       setIsLoading(false);
     }
-  }, [isLoadingDays, isLoadingServices])
+  }, [isLoadingDays, isLoadingServices, isLoadingTurns])
 
   const itemWrapper = () => {
     if (isLoading) {
@@ -48,6 +55,10 @@ export default function ControlPanel() {
 
     if (showContent === 'services') {
       return <ServiceList services={services} />
+    }
+
+    if (showContent === 'turns') {
+      return <TurnCalendar />
     }
   };
 
@@ -72,6 +83,13 @@ export default function ControlPanel() {
             {isLoadingDays ? "Buscando..." : "Dias"}
           </button>
           <button 
+            onClick={searchTurnos} 
+            disabled={isLoadingTurns}
+            style={styles.button}
+          >
+            {isLoadingTurns ? "Buscando..." : "Turnos"}
+          </button>
+          <button 
             onClick={handleLogout}
             style={styles.button}
           >
@@ -83,7 +101,7 @@ export default function ControlPanel() {
       {/* Contenido principal */}
       <div style={styles.mainContent}>
         <h1 style={styles.welcomeTitle}>{capitalize("bienvenido")} 🎉</h1>
-        
+
         {errorDays && (
           <div style={styles.error}>
             {errorDays}
@@ -94,11 +112,16 @@ export default function ControlPanel() {
             {errorServices}
           </div>
         )}
+        {errorTurns && (
+          <div style={styles.error}>
+            {errorTurns}
+          </div>
+        )}
+
         
         <div id="itemWrapper">
           {itemWrapper()}
         </div>
-        <TurnList/>
       </div>
     </div>
   );
@@ -147,12 +170,6 @@ const styles = {
     border: "1px solid #f5c6cb",
     borderRadius: "4px",
     marginBottom: "20px"
-  },
-  welcomeTitle: {
-    color: '#2c3e50',
-    marginBottom: '20px',
-    fontSize: '28px',
-    fontWeight: '300'
   },
   overlay: {
     display: 'flex',

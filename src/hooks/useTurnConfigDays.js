@@ -55,12 +55,12 @@ const updateTurnConfigDay = async (id, idTurnConfig, day, hourBegin, hourEnd, tu
     }
   }
 
-const createTurnConfigDay = async (idTurnConfig, day, hour_begin, hour_end, turn_time ) => {
+const createTurnConfigDay = async (idTurnConfig, day, hourBegin, hourEnd, turnTime ) => {
   console.log('hellow');
   const token = getToken();
   try {
      console.log('hola');
-    const data = await fetchCreateTurnConfigDay(token, idTurnConfig, day, hour_begin, hour_end, turn_time );
+    const data = await fetchCreateTurnConfigDay(token, idTurnConfig, day, hourBegin, hourEnd, turnTime );
     setTurnConfigDays(prevTurnConfigDays => [...prevTurnConfigDays, data]);
   } catch (err) {
     setErrorDays(err.message);

@@ -25,9 +25,9 @@ function TurnConfigDayCard({ turnConfigDay }) {
 
     const {turnConfigDays, error, updateTurnConfigDay, deleteTurnConfigDay, createTurnConfigDay} = useTurnConfigDays();
     const [day, setDay] = useState("Martes");
-    const [hourBegin, setHourBegin] = useState(new Date());
-    const [hourEnd, setHourEnd] = useState(new Date());
-    const [turnTime, setTurnTime] = useState(new Date());
+    const [hourBegin, setHourBegin] = useState('');
+    const [hourEnd, setHourEnd] = useState('');
+    const [turnTime, setTurnTime] = useState('');
 
     const turnConfigDayId = turnConfigDay.id;
     const turnConfigId = turnConfigDay.turnConfigId;
@@ -49,7 +49,7 @@ function TurnConfigDayCard({ turnConfigDay }) {
       e.preventDefault();
   
       try {
-        await createTurnConfigDay (turnConfigId, day, hourBegin, hourEnd, turnTime);
+        await createTurnConfigDay (turnConfigId, day, hourEnd, turnTime, hourBegin);
         console.log("llegue aca");
       } catch (error) {
         console.error("hermoso error");
@@ -59,7 +59,7 @@ function TurnConfigDayCard({ turnConfigDay }) {
 
     const handleDeleteTurnConfigDay = async () => {
         const confirmDelete = window.confirm(
-        "¿Estás seguro de que quieres eliminar este servicio? Esta acción no se puede deshacer."
+        "¿Estás seguro de que quieres eliminar este dia? Esta acción no se puede deshacer."
       );
 
       if (!confirmDelete) {
@@ -144,8 +144,8 @@ function TurnConfigDayCard({ turnConfigDay }) {
         <>
         {console.log(turnConfigDay)}
         <h3>{turnConfigDay.day}</h3>
-        <p>Jornada: {moment(turnConfigDay.hourBegin.date).format("HH:mm")} -- {moment(turnConfigDay.hourEnd.date).format("HH:mm")}</p>
-        <p>Duracion de turnos: {moment(turnConfigDay.turnTime.date).format("HH:mm")}</p>
+        <p>Jornada: {moment(turnConfigDay.hourEnd.date).format("HH:mm")} -- {moment(turnConfigDay.turnTime.date).format("HH:mm")}</p>
+        <p>Duracion de turnos: {moment(turnConfigDay.hourBegin.date).format("HH:mm")}</p>
         <p>ID Configuracion: {turnConfigDay.turnConfigId}</p>
         <p>ID: {turnConfigDay.id}</p>
         </>
