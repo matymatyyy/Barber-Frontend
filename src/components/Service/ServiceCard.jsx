@@ -3,7 +3,6 @@ import { useServices } from "../../hooks/useServices";
 function ServiceCard({ service }) {
 
   const [isUpdateFormShown, setIsUpdateFormShown] = useState(true);
-  const [isCreateFormShown, setIsCreateFormShown] = useState(false);
 
   
   const showUpdateForm = () => {
@@ -15,15 +14,8 @@ function ServiceCard({ service }) {
     
   };
 
-  const showCreateForm = () => {
-    if(isCreateFormShown === false) {
-      setIsCreateFormShown(true);
-    } else {
-      setIsCreateFormShown(false);
-    }
-  }
 
-    const {services, error, updateServices, deleteService, createService} = useServices();
+    const {services, error, updateServices, deleteService} = useServices();
     const [type, setType] = useState("Corte");
     const [price, setPrice] = useState("");
   
@@ -43,17 +35,6 @@ function ServiceCard({ service }) {
   
     }
 
-    const handleCreate = async (e) => {
-      e.preventDefault();
-
-      try {
-        await createService (type, price);
-        console.log("llegue aca2");
-      } catch (error) {
-        console.error("hermoso error");
-      }
-  
-    }
 
     const handleDeleteService = async () => {
         const confirmDelete = window.confirm(
@@ -74,36 +55,6 @@ function ServiceCard({ service }) {
 
   return (
     <div>
-      {isCreateFormShown ?
-      (
-        <>
-        <form onSubmit={handleCreate}>
-          <select onChange={(e) => setType(e.target.value) }>
-            <option value={"Corte"}>Corte</option>
-            <option value={"Tinte"}>Tinte</option>
-          </select>
-          <input 
-            type="text" 
-            placeholder='precio'
-            value={price}
-            onChange={(e) => setPrice(e.target.value)} 
-          />
-          <input 
-            type="submit" 
-          />
-        </form>
-
-
-        </>
-      )
-      :
-      (
-        <>
-        <button onClick={showCreateForm}>+</button>
-        </>
-      )
-      }
-
 
     <div style={{ padding: "15px", border: "1px solid #ddd", borderRadius: "8px" }}>
       
@@ -121,10 +72,12 @@ function ServiceCard({ service }) {
         <>
     <form onSubmit={handleUpdate}>
     <h3>
-      <select onChange={(e) => setType(e.target.value) }>
-        <option value={"Corte"}>Corte</option>
-        <option value={"Tinte"}>Tinte</option>
-      </select>
+      <input 
+        type="text" 
+        placeholder='Corte/Tinte'
+        value={type}
+        onChange={(e) => setType(e.target.value)} 
+      />
     </h3>
     <p>
       <input 

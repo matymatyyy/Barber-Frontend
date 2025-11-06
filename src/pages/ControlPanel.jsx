@@ -9,7 +9,9 @@ import { useEffect, useState } from "react";
 
 //components
 import ServiceList from "../components/Service/ServiceList";
+import ServiceCreateForm from "../components/Service/ServiceCreateForm";
 import TurnConfigDayList from "../components/TurnConfigDay/TurnConfigDayList";
+import TurnConfigDayCreateForm from "../components/TurnConfigDay/TurnConfigDayCreateForm";
 import TurnCalendar from "../components/Turn/TurnCalendar";
 import Spinner from "../components/Spinner";
 
@@ -23,6 +25,7 @@ export default function ControlPanel() {
   const { services, isLoadingServices, errorServices, searchServices } = useServices();
   const { turnConfigDay, isLoadingDays, errorDays, searchTurnConfigDays } = useTurnConfigDays();
   const { turnos, isLoadingTurns, errorTurns, searchTurnos } = useTurns();
+  const [isServiceCreateFormShown, setIsServiceCreateFormShown] = useState(false);
   const { logout } = useAuth();
 
   const handleLogout = () => {
@@ -50,11 +53,17 @@ export default function ControlPanel() {
     }
     
     if (showContent === 'days') {
-      return <TurnConfigDayList turnConfigDays={turnConfigDay} />
+      return <div>
+            <TurnConfigDayCreateForm turnConfigDays={turnConfigDay} />
+            <TurnConfigDayList turnConfigDays={turnConfigDay} />
+          </div>
     }
 
     if (showContent === 'services') {
-      return <ServiceList services={services} />
+      return <div>
+              <ServiceCreateForm services={services}/>
+              <ServiceList services={services} />
+            </div>
     }
 
     if (showContent === 'turns') {
