@@ -8,7 +8,6 @@ export default function LocationPage() {
       
       <div style={styles.pageContainer}>
         <div style={styles.container}>
-          {/* Mapa */}
           <div style={styles.mapSection}>
             <div style={styles.mapContainer}>
               <iframe
@@ -65,7 +64,7 @@ export default function LocationPage() {
 
             <div style={styles.buttonContainer}>
               <a 
-                href="https://www.google.com/maps/dir/?api=1&destination=-34.6452778,-60.4586389"
+                href="https://www.google.com/maps/dir/?api=1&destination="
                 target="_blank"
                 rel="noopener noreferrer"
                 style={styles.directionsButton}

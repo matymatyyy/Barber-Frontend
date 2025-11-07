@@ -20,10 +20,8 @@ export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, on
       return;
     }
 
-    // Pasar el método de pago al componente padre
     onConfirm({ paymentMethod });
     
-    // Resetear el modal
     setShowPaymentOptions(false);
     setPaymentMethod('');
   };
@@ -42,7 +40,6 @@ export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, on
         </button>
         
         {!showPaymentOptions ? (
-          // Vista inicial - Confirmar turno
           <>
             <h2 style={styles.modalTitle}>¿Confirmar Reserva?</h2>
             
@@ -72,7 +69,6 @@ export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, on
             </div>
           </>
         ) : (
-          // Vista de selección de pago
           <>
             <h2 style={styles.modalTitle}>Método de Pago</h2>
             
@@ -81,7 +77,6 @@ export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, on
             </p>
 
             <div style={styles.paymentOptions}>
-              {/* Opción Efectivo */}
               <div 
                 style={{
                   ...styles.paymentCard,
@@ -99,7 +94,6 @@ export default function ReservationModal({ isOpen, onClose, selectedTimeSlot, on
                 )}
               </div>
 
-              {/* Opción Mercado Pago */}
               <div 
                 style={{
                   ...styles.paymentCard,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import FeedbackModal from "../components/common/FeedbackModal";
 
 // Importa el CSS local
 import './Login.css'; 
@@ -11,8 +12,29 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const [feedbackModal, setFeedbackModal] = useState({
+    isOpen: false,
+    status: 'loading', // 'loading' | 'success' | 'error'
+    message: ''
+  });
+
+  const handleCloseFeedbackModal = () => {
+    setFeedbackModal({
+      isOpen: false,
+      status: 'loading',
+      message: ''
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Mostrar modal de carga
+    setFeedbackModal({
+      isOpen: true,
+      status: 'loading',
+      message: 'Iniciando sesión...'
+    });
 
     try {
       const res = await fetch("http://localhost:91/login", {
@@ -23,14 +45,37 @@ export default function Login() {
 
       if (res.ok) {
         const data = await res.json();
-        login(data.token); // guardamos JWT
-        navigate("/");
+        
+        // Mostrar éxito
+        setFeedbackModal({
+          isOpen: true,
+          status: 'success',
+          message: '¡Inicio de sesión exitoso! Redirigiendo...'
+        });
+
+        // Guardar token y redirigir después de un momento
+        login(data.token);
+        
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       } else {
-        alert("Credenciales incorrectas");
+        // Mostrar error de credenciales
+        setFeedbackModal({
+          isOpen: true,
+          status: 'error',
+          message: 'Credenciales incorrectas. Por favor verifica tu email y contraseña.'
+        });
       }
     } catch (error) {
       console.error("Error en login:", error);
-      alert("Error al conectar con el servidor");
+      
+      // Mostrar error de conexión
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'Error al conectar con el servidor. Por favor intenta nuevamente.'
+      });
     }
   };
 
@@ -45,32 +90,43 @@ export default function Login() {
   };
 
   return (
-    //  Div que aplica el fondo de pantalla oscuro
-    <div style={fullScreenDarkStyle}> 
-      {/* Contenedor del formulario con la clase .login-container */}
-      <div className="login-container">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {/* <br /> ELIMINADO */}
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {/* <br /> ELIMINADO */}
-          <button type="submit" className="login-button">Entrar</button>
-        </form>
-        <p className="register-text">
-          ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
-        </p>
+    <>
+      {/* Div que aplica el fondo de pantalla oscuro */}
+      <div style={fullScreenDarkStyle}> 
+        {/* Contenedor del formulario con la clase .login-container */}
+        <div className="login-container">
+          <h2>Login</h2>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button type="submit" className="login-button">Entrar</button>
+          </form>
+          <p className="register-text">
+            ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Modal de Feedback */}
+      <FeedbackModal
+        isOpen={feedbackModal.isOpen}
+        status={feedbackModal.status}
+        message={feedbackModal.message}
+        onClose={handleCloseFeedbackModal}
+        autoCloseDelay={3000}
+      />
+    </>
   );
 }

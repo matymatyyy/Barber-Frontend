@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer";
 import Preloader from "../components/common/Preloader";
 import Calendar from "../components/Calendar";
 import ReservationModal from "../components/ReservationModal";
+import FeedbackModal from "../components/common/FeedbackModal";
 
 export default function ReservationTurns() {
   const location = useLocation();
@@ -20,7 +21,12 @@ export default function ReservationTurns() {
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState(null);
 
-  // Verificar autenticación
+  const [feedbackModal, setFeedbackModal] = useState({
+    isOpen: false,
+    status: 'loading', // 'loading' | 'success' | 'error'
+    message: ''
+  });
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const email = localStorage.getItem('userEmail');
@@ -31,23 +37,35 @@ export default function ReservationTurns() {
   }, []);
 
   const formatBackendDataToEvents = (backendData) => {
+    const ahora = new Date();
+    
+    const inicioAyer = new Date(ahora);
+    inicioAyer.setDate(inicioAyer.getDate());
+    inicioAyer.setHours(0, 0, 0, 0);
+    
     return backendData.data.map(turno => {
       const fecha = turno.date.date.split(' ')[0];
       const horaInicio = turno.hourBegin.date.split(' ')[1];
       const horaFin = turno.hourEnd.date.split(' ')[1];
       
+      const fechaInicio = new Date(`${fecha}T${horaInicio}`);
+      const esPasado = fechaInicio < inicioAyer;
+      
+      const estaOcupado = turno.state || esPasado;
+      
       return {
         id: turno.id,
-        title: turno.state ? 'Ocupado' : 'Disponible',
+        title: esPasado ? 'Pasado' : (turno.state ? 'Ocupado' : 'Disponible'),
         start: `${fecha}T${horaInicio}`,
         end: `${fecha}T${horaFin}`,
-        backgroundColor: turno.state ? '#ef4444' : '#10b981',
-        borderColor: turno.state ? '#ef4444' : '#10b981',
+        backgroundColor: esPasado ? '#9ca3af' : (turno.state ? '#ef4444' : '#10b981'),
+        borderColor: esPasado ? '#9ca3af' : (turno.state ? '#ef4444' : '#10b981'),
         display: 'block',
         extendedProps: {
           barberID: turno.barberID,
           clienteID: turno.clienteID,
-          state: turno.state
+          state: estaOcupado,
+          isPast: esPasado
         }
       };
     });
@@ -85,8 +103,50 @@ export default function ReservationTurns() {
 
   const handleDateSelect = (info) => {
     if (!isLoggedIn) {
-      alert('Debes iniciar sesión para reservar un turno');
-      navigate('/login');
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'Debes iniciar sesión para reservar un turno'
+      });
+      return;
+    }
+
+    // Validar si el turno está ocupado o es pasado
+    if (info.event) {
+      const eventProps = info.event.extendedProps;
+      
+      if (eventProps.isPast) {
+        setFeedbackModal({
+          isOpen: true,
+          status: 'error',
+          message: 'No puedes reservar turnos en fechas u horarios pasados.'
+        });
+        return;
+      }
+
+      if (eventProps.state) {
+        setFeedbackModal({
+          isOpen: true,
+          status: 'error',
+          message: 'Este turno ya está ocupado. Por favor selecciona otro horario disponible.'
+        });
+        return;
+      }
+    }
+
+    const ahora = new Date();
+    const fechaSeleccionada = new Date(info.startStr || info.start);
+
+    const inicioAyer = new Date(ahora);
+    inicioAyer.setDate(inicioAyer.getDate() - 1);
+    inicioAyer.setHours(0, 0, 0, 0);
+
+    if (fechaSeleccionada < inicioAyer) {
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'No puedes reservar turnos en fechas u horarios pasados.'
+      });
       return;
     }
 
@@ -109,13 +169,27 @@ export default function ReservationTurns() {
     setSelectedTimeSlot(null);
   };
 
+  const handleCloseFeedbackModal = () => {
+    setFeedbackModal({
+      isOpen: false,
+      status: 'loading',
+      message: ''
+    });
+  };
+
   const handleConfirmReservation = async (paymentData) => {
     const testUserId = userId || 1;
     const testUserEmail = userEmail || 'test@test.com';
     const token = localStorage.getItem('token');
     
     if (!testUserEmail || !testUserId || !token) {
-      alert('Error: No se pudo identificar al usuario. Por favor inicia sesión.');
+      handleCloseModal();
+
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'No se pudo identificar al usuario. Por favor inicia sesión nuevamente.'
+      });
       return;
     }
 
@@ -126,6 +200,14 @@ export default function ReservationTurns() {
     };
 
     console.log('Confirmar reserva:', reservationData);
+
+    handleCloseModal();
+
+    setFeedbackModal({
+      isOpen: true,
+      status: 'loading',
+      message: 'Procesando tu reserva...'
+    });
 
     try {
       if (paymentData.paymentMethod === 'mercadopago') {
@@ -156,6 +238,8 @@ export default function ReservationTurns() {
         const mpData = await mpResponse.json();
         
         localStorage.setItem('pendingTurnId', selectedTimeSlot.eventId);
+
+        setFeedbackModal({ isOpen: false, status: 'loading', message: '' });
         
         window.location.href = mpData.checkout_url || mpData.sandbox_init_point;
         return;
@@ -169,15 +253,26 @@ export default function ReservationTurns() {
       });
       
       if (!response.ok) {
-        throw new Error('Error al realizar la reserva');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al realizar la reserva');
       }
-      
-      alert('¡Reserva confirmada con éxito! Pagarás en efectivo en el local.');
-      handleCloseModal();
+
+      setFeedbackModal({
+        isOpen: true,
+        status: 'success',
+        message: '¡Reserva confirmada con éxito! Pagarás en efectivo en el local.'
+      });
+
       fetchTurnos();
+      
     } catch (error) {
       console.error('Error al confirmar reserva:', error);
-      alert('Error al confirmar la reserva. Por favor intenta nuevamente.');
+
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: error.message || 'Error al confirmar la reserva. Por favor intenta nuevamente.'
+      });
     }
   };
 
@@ -198,6 +293,45 @@ export default function ReservationTurns() {
           <p style={{ textAlign: "center", marginBottom: "1rem", color: "#666" }}>
             Haz clic en un día del mes para ver los horarios disponibles, luego selecciona un turno verde (disponible)
           </p>
+          <div style={{ 
+            textAlign: "center", 
+            marginBottom: "2rem",
+            display: "flex",
+            gap: "2rem",
+            justifyContent: "center",
+            flexWrap: "wrap"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ 
+                display: "inline-block", 
+                width: "20px", 
+                height: "20px", 
+                backgroundColor: "#10b981",
+                borderRadius: "4px"
+              }}></span>
+              <span style={{ fontSize: "0.9rem", color: "#666" }}>Disponible</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ 
+                display: "inline-block", 
+                width: "20px", 
+                height: "20px", 
+                backgroundColor: "#ef4444",
+                borderRadius: "4px"
+              }}></span>
+              <span style={{ fontSize: "0.9rem", color: "#666" }}>Ocupado</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ 
+                display: "inline-block", 
+                width: "20px", 
+                height: "20px", 
+                backgroundColor: "#9ca3af",
+                borderRadius: "4px"
+              }}></span>
+              <span style={{ fontSize: "0.9rem", color: "#666" }}>Pasado</span>
+            </div>
+          </div>
           {!isLoggedIn && (
             <div style={{ 
               textAlign: "center", 
@@ -235,6 +369,14 @@ export default function ReservationTurns() {
         onClose={handleCloseModal}
         selectedTimeSlot={selectedTimeSlot}
         onConfirm={handleConfirmReservation}
+      />
+
+      <FeedbackModal
+        isOpen={feedbackModal.isOpen}
+        status={feedbackModal.status}
+        message={feedbackModal.message}
+        onClose={handleCloseFeedbackModal}
+        autoCloseDelay={3000}
       />
 
       <Footer />
