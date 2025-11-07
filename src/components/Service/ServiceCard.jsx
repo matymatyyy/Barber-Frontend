@@ -16,7 +16,7 @@ function ServiceCard({ service }) {
 
 
     const {services, error, updateServices, deleteService} = useServices();
-    const [type, setType] = useState("Corte");
+    const [type, setType] = useState("");
     const [price, setPrice] = useState("");
   
     const serviceId = service.id;
@@ -74,7 +74,7 @@ function ServiceCard({ service }) {
     <h3>
       <input 
         type="text" 
-        placeholder='Corte/Tinte'
+        placeholder={service.type}
         value={type}
         onChange={(e) => setType(e.target.value)} 
       />
@@ -95,11 +95,11 @@ function ServiceCard({ service }) {
         </>
       )  
       } 
-      <div /*style={styles.buttonSection}*/>
+      <div>
         <button onClick={handleDeleteService}>
           x
         </button>
-        <button onClick={showUpdateForm}/*style={styles.editButton}*/>
+        <button onClick={showUpdateForm}>
           e
         </button>
       </div>
