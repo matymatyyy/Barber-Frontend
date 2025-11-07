@@ -1,12 +1,19 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
+import FeedbackModal from "../components/common/FeedbackModal";
 
 export default function Calendar({ events, onDateSelect, onDateClick, isLoggedIn }) {
   const calendarRef = useRef(null);
+
+    const [feedbackModal, setFeedbackModal] = useState({
+      isOpen: false,
+      status: 'loading', // 'loading' | 'success' | 'error'
+      message: ''
+    });
 
   useEffect(() => {
     const styleId = 'calendar-hide-events-style';
@@ -69,16 +76,21 @@ export default function Calendar({ events, onDateSelect, onDateClick, isLoggedIn
     const isOcupado = event.extendedProps.state;
     
     if (!isLoggedIn) {
-      alert('Debes iniciar sesión para reservar un turno');
-      return;
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'Debes iniciar sesión para reservar un turno'
+      });
     }
     
     if (isOcupado) {
-      alert('Este turno ya está ocupado. Por favor selecciona otro horario disponible.');
-      return;
+      setFeedbackModal({
+        isOpen: true,
+        status: 'error',
+        message: 'Este turno ya está ocupado. Por favor selecciona otro horario disponible.'
+      });
     }
     
-    // Llamar a onDateSelect cuando se hace clic en un turno disponible
     if (onDateSelect) {
       onDateSelect({
         start: event.start,

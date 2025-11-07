@@ -15,7 +15,7 @@ export default function About() {
 
           <div className="about-images">
             <div className="about-img"></div>
-            <div className="about-img"></div>
+            <div className="about-img"></div>{/* Las imagenes se cargan por css, cosas a mejorar */}
             <div className="about-img"></div>
           </div>
         </div>
